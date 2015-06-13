@@ -17,34 +17,29 @@ $ git clone https://github.com/hoch/motw-2015.git
 Move into the project directory and run the command:
 ~~~
 $ motw_install.sh
-[MOTW-BP] Pre-install check passed!
-[MOTW-BP] Installing:
-  + installing Node modules...
-  + installing Bower components...
-[MOTW-BP] Done!
 ~~~
 
 ## How to Get Started
 
 Make sure you are in __the project root directory__ before running the following commands.
 
-1. Start up the dev server and do your work. Any change in the `src` directory will trigger the refresh in the browser automatically.
+- Start up the dev server and do your work. Any change in the `src` directory will trigger _the refresh in the browser automatically._
 ~~~
 $ gulp dev
 ~~~
 
-2. When you want to check the actual preview of the web site, build and start the preview server. This will minify all the codes and consolidate the content into `app` directory.
+- When you want to check the actual preview of the web site, build and start the preview server. This will minify all the codes and consolidate the content into `app` directory.
 ~~~
 $ gulp build
 $ gulp preview
 ~~~
 
-3. If you like how it looks on the preview server, deploy the `app` directory to `gh-pages` branch.
+- If you like how it looks on the preview server, deploy the `app` directory to `gh-pages` branch. You might have to type in your credential for the GitHub access.
 ~~~
 $ gulp deploy
 ~~~
 
-Note that the git configuration MUST be changed to route the deployment to your target repository. You only have to do this once.
+Note that the git configuration __MUST__ be changed to route the deployment to your remote target repository. You only have to do this once.
 ~~~
 $ git remote set-url origin https://github.com/USERNAME/OTHERREPOSITORY.git
 ~~~
