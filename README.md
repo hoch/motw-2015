@@ -38,7 +38,7 @@ $ gulp preview
 
 ## Deployment
 
-Note that the git configuration __MUST__ be changed to route the deployment to your remote target repository. You only have to do this once.
+Note that the git configuration __MUST__ be changed to route the deployment to your remote target repository. You only have to do this once with your own `USERNAME` and `MYREPOSITORY`.
 ~~~bash
 # git config to change remote origin
 $ git remote set-url origin https://github.com/USERNAME/MYREPOSITORY.git
@@ -50,7 +50,7 @@ If you are ready to upload the content, deploy the `app` directory to `gh-pages`
 $ gulp deploy
 ~~~
 
-To access the deployed site, open this URL in your browser.
+To access the deployed site, open this URL in your browser. Change `USERNAME` and `MYREPOSITORY` accordingly.
 ~~~
 https://USERNAME.github.io/MYREPOSITORY
 ~~~
