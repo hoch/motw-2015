@@ -52,7 +52,7 @@ $ gulp deploy
 
 To access the deployed site, open this URL in your browser.
 ~~~
-https://USERNAME.github.io/hoch/MYREPOSITORY
+https://USERNAME.github.io/MYREPOSITORY
 ~~~
 
 ## LICENSE
