@@ -56,7 +56,7 @@ If you are ready to upload the content, deploy the `app` directory to `gh-pages`
 $ gulp deploy
 ~~~
 
-To access the deployed site, open this URL in your browser. Change `USERNAME` and `MYREPOSITORY` accordingly.
+To access the deployed site, open this URL in your browser. Change `USERNAME` and `MYREPOSITORY` accordingly. For example, the deployed side of this repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).
 ~~~
 https://USERNAME.github.io/MYREPOSITORY
 ~~~
