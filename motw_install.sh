@@ -8,14 +8,18 @@ WHT='\033[1;37m'
 command -v git >/dev/null 2>&1 || { echo >&2 "git is not installed!!"; exit 1; }
 command -v npm >/dev/null 2>&1 || { echo >&2 "Node is not installed!!"; exit 1; }
 command -v bower >/dev/null 2>&1 || { echo >&2 "Bower is not installed!!"; exit 1; }
-printf "${LGR}[MOTW-BP] ${WHT}Pre-install check passed!\n"
+command -v gulp >/dev/null 2>&1 || { echo >&2 "Gulp is not installed!!"; exit 1; }
+printf "${LGR}[MOTW-STARTER-KIT] ${WHT}Pre-install check passed!\n"
 
 # Installation
-printf "${LGR}[MOTW-BP] ${WHT}Installing:\n"
+# TODO: error handling.
+printf "${LGR}[MOTW-STARTER-KIT] ${WHT}Installing:\n"
 printf "  + installing Node modules...\n"
-npm install > log_motw_install
+npm install > motw_install.log
 printf "  + installing Bower components...\n"
-pushd src >> ../log_motw_install
-bower install >> ../log_motw_install
-popd >> ../log_motw_install
-printf "${LGR}[MOTW-BP] ${WHT}Done!\n"
+pushd src >> ../motw_install.log
+bower install >> ../motw_install.log
+popd >> ../motw_install.log
+
+# Finish
+printf "${LGR}[MOTW-STARTER-KIT] ${WHT}Done!\n"

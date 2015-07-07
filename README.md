@@ -1,6 +1,6 @@
-# MOTW: Starter Kit
+# Musicking on the Web: Starter Kit
 
-This repository is a stater kit for Musicking on the Web workshop. The MOTW workshop 2015 is hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) between 7/8 ~ 7/10.
+This repository is a stater kit for Musicking on the Web workshop. The MOTW workshop 2015 will be hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) and be a part of [Music 220A](https://ccrma.stanford.edu/courses/220a/) class at [CCRMA](https://ccrma.stanford.edu) at Stanford University.
 
 ## Prerequisites
 - [Git](https://git-scm.com/)
@@ -8,7 +8,10 @@ This repository is a stater kit for Musicking on the Web workshop. The MOTW work
 - [Bower](http://bower.io/#install-bower)
 - [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
 
+Note that the installation of these prerequistes may require the system admin previlages.
+
 ## Get the code
+Run the command in the terminal:
 ~~~
 $ git clone https://github.com/hoch/motw-2015.git
 ~~~
@@ -16,6 +19,7 @@ $ git clone https://github.com/hoch/motw-2015.git
 ## Installation
 Move into the project directory and run the command:
 ~~~
+$ cd motw-2015
 $ motw_install.sh
 ~~~
 
@@ -34,10 +38,12 @@ $ gulp dev
 # build site and start preview server
 $ gulp build
 $ gulp preview
+
+# Or simply do both by using the default task
+$ gulp
 ~~~
 
 ## Deployment
-
 Note that the git configuration __MUST__ be changed to route the deployment to your remote target repository. You only have to do this once with your own `USERNAME` and `MYREPOSITORY`.
 ~~~bash
 # git config to change remote origin
@@ -57,4 +63,4 @@ https://USERNAME.github.io/MYREPOSITORY
 
 ## LICENSE
 
-The MIT License (MIT). Copyright (c) 2015 Hongchan Choi.
+Copyright (c) 2015 Hongchan Choi. The MIT License.

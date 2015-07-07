@@ -4,14 +4,15 @@
 
 var gulp        = require('gulp'),
     plugins     = require('gulp-load-plugins')(),
-    browserSync = require('browser-sync'),
+    browserSync = require('browser-sync').create(),
     runSequence = require('run-sequence'),
     del         = require('del');
 
 var reload      = browserSync.reload;
 var deploy      = require('gulp-gh-pages');
 
-gulp.task('clean-build', del.bind(null, [
+gulp.task('clean', del.bind(null, [
+  '.publish',
   'app/**/*',
   '!app'
 ]));
@@ -31,6 +32,7 @@ gulp.task('build-script', function () {
 });
 
 gulp.task('build-asset', function () {
+  // TODO: add image optimization.
   return gulp.src('src/assets/**/*')
     .pipe(gulp.dest('app/assets'))
     .pipe(plugins.size({ title: 'ASSETS' }));
@@ -43,18 +45,19 @@ gulp.task('build-html', function () {
 });
 
 gulp.task('build-component', function () {
+  // TODO: add vulcanization.
   return gulp.src('src/bower_components/**/*')
     .pipe(gulp.dest('app/bower_components'))
     .pipe(plugins.size({ title: 'COMPONENTS' }));
 });
 
 gulp.task('build', function (cb) {
-  runSequence('clean-build', 
+  runSequence('clean', 
     ['build-style', 'build-script', 'build-asset', 'build-html', 'build-component'], cb);
 });
 
 gulp.task('dev', function () {
-  browserSync({
+  browserSync.init({
     notify: false,
     server: {
       baseDir: 'src'
@@ -63,13 +66,14 @@ gulp.task('dev', function () {
   });
 
   gulp.watch([
+    'src/*.html',
     'src/scripts/*.js',
     'src/css/*.css'
   ], reload);
 });
 
 gulp.task('preview', function () {
-  browserSync({
+  browserSync.init({
     notify: false,
     server: {
       baseDir: 'app'
@@ -84,5 +88,5 @@ gulp.task('deploy', function () {
 });
 
 gulp.task('default', function (cb) {
-  runSequence('preview', cb);
+  runSequence('build', 'preview', cb);
 });

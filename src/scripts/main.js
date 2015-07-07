@@ -1,2 +1,8 @@
 /** main.js */
-console.log('hello world!');
+(function (Global) {
+	
+	'use strict';
+
+	console.log('hello world!');
+
+})(this);
