@@ -1,7 +1,7 @@
 {
   "name": "motw-2015",
-  "version": "0.0.2",
-  "description": "Boilerplate project and code examples for MOTW 2015 workshop.",
+  "version": "0.0.3",
+  "description": "The boilerplate project with code examples for MOTW 2015 workshop.",
   "author": "Hongchan Choi <hongchan.choi@gmail.com>",
   "devDependencies": {
     "browser-sync": "^2.8.2",
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hoch/motw-test-repo.git"
+    "url": "git://github.com/hoch/motw-2015.git"
   },
   "bugs": {
-    "url": "https://github.com/hoch/motw-test-repo/issues"
+    "url": "https://github.com/hoch/motw-2015/issues"
   },
   "license": "MIT"
 }
