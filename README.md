@@ -1,6 +1,6 @@
-# Musicking on the Web: Starter Kit
+# Musicking on the Web: Boilerplate Project
 
-This repository is a stater kit for Musicking on the Web workshop. The MOTW workshop 2015 will be hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) and be a part of [Music 220A](https://ccrma.stanford.edu/courses/220a/) class at [CCRMA](https://ccrma.stanford.edu) at Stanford University.
+This repository is the boilerplate project for Musicking on the Web workshop. The MOTW workshop 2015 will be hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) and be a part of [Music 220A](https://ccrma.stanford.edu/courses/220a/) class at [CCRMA](https://ccrma.stanford.edu) at Stanford University.
 
 ## Prerequisites
 - [Git](https://git-scm.com/)
@@ -8,7 +8,7 @@ This repository is a stater kit for Musicking on the Web workshop. The MOTW work
 - [Bower](http://bower.io/#install-bower)
 - [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
 
-Note that the installation of these prerequistes may require the system admin previlages.
+Note that the installation of these prerequisites may require the system admin privileges.
 
 ## Get the code
 Run the command in the terminal:
@@ -20,7 +20,7 @@ $ git clone https://github.com/hoch/motw-2015.git
 Move into the project directory and run the command:
 ~~~
 $ cd motw-2015
-$ motw_install.sh
+$ ./motw_install.sh
 ~~~
 
 ## How to Get Started
