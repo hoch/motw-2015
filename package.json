@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hoch/motw-2015.git"
+    "url": "git://github.com/hoch/motw-test-repo.git"
   },
   "bugs": {
-    "url": "https://github.com/hoch/motw-2015/issues"
+    "url": "https://github.com/hoch/motw-test-repo/issues"
   },
   "license": "MIT"
 }

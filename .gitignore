@@ -1,6 +1,6 @@
 .DS_Store
 NOTES.md
-log_motw_install
+motw_install.log
 node_modules
 app
 src/bower_components

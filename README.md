@@ -44,15 +44,23 @@ $ gulp
 ~~~
 
 ## Deployment
+
+Before deploying your project, be sure to create a [GitHub repository](https://help.github.com/articles/create-a-repo/).
+
 Note that the git configuration __MUST__ be changed to route the deployment to your remote target repository. You only have to do this once with your own `USERNAME` and `MYREPOSITORY`.
+
+Note that you have to build the application at least once to have the `app` directory ready.
 ~~~bash
-# git config to change remote origin
+# Build the application first and commit.
+$ gulp build
+$ git commit -am 'initial commit'
+# Change remote origin.
 $ git remote set-url origin https://github.com/USERNAME/MYREPOSITORY.git
 ~~~
 
 If you are ready to upload the content, deploy the `app` directory to `gh-pages` branch with the following command. You might have to type your credential.
 ~~~bash
-# deploy site to gh-pages branch
+# Deploy site to gh-pages branch.
 $ gulp deploy
 ~~~
 
