@@ -20,35 +20,30 @@ gulp.task('clean', del.bind(null, [
 gulp.task('build-style', function () {
   return gulp.src('src/css/*.css')
     .pipe(plugins.cssmin())
-    .pipe(gulp.dest('app/css'))
-    .pipe(plugins.size({ title: 'STYLES' }));
+    .pipe(gulp.dest('app/css'));
 });
 
 gulp.task('build-script', function () {
   return gulp.src('src/scripts/*.js')
     .pipe(plugins.uglify({ mangle: false }))
-    .pipe(gulp.dest('app/scripts'))
-    .pipe(plugins.size({ title: 'SCRIPTS' }));
+    .pipe(gulp.dest('app/scripts'));
 });
 
 gulp.task('build-asset', function () {
   // TODO: add image optimization.
   return gulp.src('src/assets/**/*')
-    .pipe(gulp.dest('app/assets'))
-    .pipe(plugins.size({ title: 'ASSETS' }));
+    .pipe(gulp.dest('app/assets'));
 });
 
 gulp.task('build-html', function () {
   return gulp.src('src/*.html')
-    .pipe(gulp.dest('app'))
-    .pipe(plugins.size({ title: 'HTML' }));
+    .pipe(gulp.dest('app'));
 });
 
 gulp.task('build-component', function () {
   // TODO: add vulcanization.
   return gulp.src('src/bower_components/**/*')
-    .pipe(gulp.dest('app/bower_components'))
-    .pipe(plugins.size({ title: 'COMPONENTS' }));
+    .pipe(gulp.dest('app/bower_components'));
 });
 
 gulp.task('build', function (cb) {

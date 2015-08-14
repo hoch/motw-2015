@@ -13,13 +13,13 @@ Note that the installation of these prerequisites may require the system admin p
 ## Get the code
 Run the command in the terminal:
 ~~~
-$ git clone https://github.com/hoch/motw-2015.git
+$ git clone https://github.com/hoch/motw-2015.git MY_DIRECTORY
 ~~~
 
 ## Installation
 Move into the project directory and run the command:
 ~~~
-$ cd motw-2015
+$ cd MY_DIRECTORY
 $ ./motw_install.sh
 ~~~
 
