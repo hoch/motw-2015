@@ -67,9 +67,9 @@ git push origin master
 $ gulp deploy
 ~~~
 
-To access the deployed site, open this URL in your browser. Change `USERNAME` and `MY_REPO` accordingly. For example, the deployed site of the current repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).
+To access the deployed site, open the URL in your browser. Change `USERNAME` and `MY_REPO` accordingly. For example, the deployed site of the current repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).
 ~~~
-open https://USERNAME.github.io/MY_REPO
+https://USERNAME.github.io/MY_REPO
 ~~~
 
 ## LICENSE
