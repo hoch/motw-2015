@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorials | MOTW 2015</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../../assets/example-common.html"></script>
+</head>
+
+<body>
+  <div class="example-header">
+    <div class="subheading-1"><a href="../">&larr; Tutorials</a></div>
+    <div class="heading-1">Subtractive Synthesizer</div>
+    <p class="example-header-desc">
+      A simple subtractive synthesizer.
+    </p>
+  </div>
+
+  <div class="example-main">
+    <div class="parameter">
+      <span class="label">Cutoff Frequency</span>
+      <input type="range" id="cutoff" min="50" value="1000" max="2500" step="50">
+      <span class="value" id="cutoff-value">1000 Hz</span>
+    </div>
+    <div class="parameter">
+      <span class="label">Resonance (Q)</span>
+      <input type="range" id="reso" min="0.1" value="1.0" max="10" step="0.5">
+      <span class="value" id="reso-value">1.0</span>
+    </div>
+    <div class="parameter">
+      <span class="label">Mute</span>
+      <input type="checkbox" id="mute" checked>
+    </div>
+    
+  </div>
+
+  <!-- <script src="step-1.js"></script> -->
+  <script src="step-2.js"></script>
+</body>
+
+</html>

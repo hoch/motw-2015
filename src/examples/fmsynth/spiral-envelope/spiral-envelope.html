@@ -1,0 +1,164 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/paper-styles.html">
+
+<dom-module id="spiral-envelope">
+  <template>
+    <style>
+    :host {
+      display: block;
+      margin: 2px 2px;
+      width: 384px;
+      height: 128px;
+      -webkit-user-select: none;
+    }
+    .c-frame {
+      fill: #607d8b;
+      stroke: #37474f;
+      stroke-width: 2.5;
+    }
+    .c-frame-selected {
+      fill: #039be5;
+      stroke: #0277bd;
+      stroke-width: 2.5;
+    }
+    .c-line {
+      fill: rgba(255, 255, 255, 0.25);
+      stroke: #eceff1;
+      stroke-width: 1.25;
+    }
+    .c-overlay {
+      fill: #fff;
+      opacity: 0;
+    }
+    </style>
+    <svg id="eTouchable" class="c-svg" width="384" height="128" version="1.1" xmlns="http://www.w3.org/2000/svg" on-track="_onTrack">
+      <rect id="eFrame" width="384" height="128" class="c-frame" />
+      <polyline id="eLine" class="c-line" />
+      <rect id="eOverlay" width="384" height="128" class="c-overlay" />
+    </svg>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'spiral-envelope',
+
+    properties: {
+
+      _values: Array,
+
+      _width: {
+        type: Number,
+        value: 384
+      },
+
+      _height: {
+        type: Number,
+        value: 128
+      },
+
+      _grabbedPointIndex: Number
+    },
+
+
+    // render UI data
+    _render: function () {
+      var points = '';
+      for (var i = 0; i < this._values.length; i++) {
+        points += (this._values[i][1] * this._width) + ',';
+        points += ((1.0 - this._values[i][0]) * this._height) + ' ';
+      }
+      this.$.eLine.setAttributeNS(null, 'points', points);
+    },
+
+    // update: model => knob
+    _update: function () {
+      this._render();
+    },
+
+    // post: knob => model
+    _post: function (index, dx, dy) {
+      if (index === 0)
+        return;
+
+      dx = (dx || 0);
+      dy = (dy || 0);
+      this._values[index][1] += dx / this._width;
+      this._values[index][0] -= dy / this._height;
+
+      this._render();
+    },
+
+    created: function () {
+    },
+
+    ready: function () {
+      // data values: normalized pair of (value, time)
+      this._values = [
+        [0.0, 0.0],
+        [1.0, 0.16],
+        [0.75, 0.33],
+        [0.55, 0.83],
+        [0.0, 1.0]
+      ];
+
+      this._grabbedPointIndex = 0;
+
+      this._update();
+    },
+
+    _grabPoint: function (x, y) {
+      var normX = x / this._width;
+      var normY = 1.0 - y / this._height;
+      
+      var which = 0;
+      var minDist = 0.1;
+      for (var i = 1; i < this._values.length - 1; i++) {
+        var dx = normX - this._values[i][1];
+        var dy = normY - this._values[i][0];
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < minDist) {
+          which = i;
+          minDist = dist;
+        }
+      }
+
+      return which;
+    },
+
+    _onTrack: function (event) {
+      var pos = event.detail;
+      pos.x = event.detail.sourceEvent.offsetX;
+      pos.y = event.detail.sourceEvent.offsetY;
+
+      switch (pos.state) {
+        case 'start':
+          document.body.style.cursor = 'move';
+          this._grabbedPointIndex = this._grabPoint(pos.x, pos.y);
+          break;
+        case 'track':
+          if (this._grabbedPointIndex > 0) {
+            this._post(this._grabbedPointIndex, pos.ddx, pos.ddy);
+          }
+          break;
+        case 'end':
+          document.body.style.cursor = 'default';
+          // this._grabbedPointIndex = 0;
+          // this._post();
+          break;
+      }
+
+      this._update();
+    },
+
+    getEnvelope: function () {
+      return this._values.slice(0);
+    }
+
+    // setEnvelope: function () {
+    //   return this._values.slice(0);
+    // }
+
+  });
+</script>
