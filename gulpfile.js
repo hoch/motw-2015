@@ -8,7 +8,6 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     del         = require('del');
 
-var reload      = browserSync.reload;
 var deploy      = require('gulp-gh-pages');
 
 gulp.task('clean', del.bind(null, [
@@ -61,10 +60,10 @@ gulp.task('dev', function () {
   });
 
   gulp.watch([
-    'src/*.html',
-    'src/scripts/*.js',
-    'src/css/*.css'
-  ], reload);
+    'src/**/*.html',
+    'src/**/*.js',
+    'src/**/*.css'
+  ], browserSync.reload);
 });
 
 gulp.task('preview', function () {
