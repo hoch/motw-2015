@@ -9,7 +9,6 @@
  *
  * Extra:
  * 1) More control on LPF with sliders.
- * 2) Implement sustain and release.
  */
 
 
@@ -79,12 +78,11 @@ window.addEventListener('keydown', function (event) {
   if (KEYS_PRESSED[event.keyCode] || !PITCH_MAP.hasOwnProperty(event.keyCode))
     return;
 
-  var midiPitch = PITCH_MAP[event.keyCode];
-
   var voice = new Voice(context, 'sawtooth');
-  voice.noteOn(midiPitch, 0.25);
-
   KEYS_PRESSED[event.keyCode] = true;
+
+  var midiPitch = PITCH_MAP[event.keyCode];
+  voice.noteOn(midiPitch, 0.25);  
 });
 
 window.addEventListener('keyup', function (event) {

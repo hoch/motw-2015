@@ -26,16 +26,8 @@ lowpass.frequency.value = 1000;
 amp.gain.value = 0.0;
 
 // Creates audio graph and starts the oscillator.
-sawosc.connect(lowpass);
-lowpass.connect(amp);
-amp.connect(context.destination);
+sawosc.to(lowpass).to(amp).to(context.DAC);
 sawosc.start();
-
-
-/**
- * Question: 
- * How can we apply vibrato to the oscillator?
- */
 
 
 // Key-to-Pitch map: this map is a small dictionary of ASCII code mapped to
@@ -60,7 +52,7 @@ var PITCH_MAP = {
 
 
 /**
- * Question: 
+ * Gotcha: 
  * Why is using the AudioParam setter problematic? What else can we do?
  */
 

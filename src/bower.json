@@ -1,6 +1,6 @@
 {
   "name": "motw-2015",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "homepage": "https://github.com/hoch/motw-2015",
   "authors": [
     "Hongchan Choi"
@@ -11,7 +11,13 @@
     "bower_components"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#~1.0.11"
+    "polymer": "Polymer/polymer#^1.1.1",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.11",
+    "paper-drawer-panel": "PolymerElements/paper-drawer-panel#^1.0.3",
+    "paper-menu": "PolymerElements/paper-menu#^1.1.0",
+    "paper-header-panel": "PolymerElements/paper-header-panel#^1.0.4",
+    "paper-item": "PolymerElements/paper-item#^1.0.2",
+    "spiral": "hoch/spiral#~0.0.1"
   }
 }
