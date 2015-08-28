@@ -1,0 +1,160 @@
+<!--
+  Tutorial 1: Subtractive Synthesizer, Step 2
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Subtractive Synth | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../assets/motw-doc-header.html">
+</head>
+
+<body>
+  
+  <div class="info">
+    <h1>Subtractive Synthesizer</h1>
+    <h2>Step 2</h2>
+    <p class="description">Design <code>Voice</code> class and apply the envelope.</p>
+    <ol>
+      <li>Design <code>Voice</code> class for the better control.</li>
+      <li>Implement AD envelope.</li>
+      <li>How to capture note on/off events nicely.</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <spiral-knob id="k-cutoff" label="Cutoff" value="250" min-value="60" max-value="1000"></spiral-knob>
+    <spiral-knob id="k-reso" label="Reso" value="1.0" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-attack" label="Attack" value="0.05" min-value="0.01" max-value="0.25"></spiral-knob>
+    <spiral-knob id="k-decay" label="Decay" value="0.25" min-value="0.01" max-value="2.0"></spiral-knob>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+  
+<script id="tutorial-code">
+
+/**
+ * Step 1: Design Voice class encapsulates the minimum unit of the synthesizer.
+ */
+function Voice(context, type) {
+  this.context = context;
+
+  context.createNodes(this, {
+    osc: 'Oscillator',
+    lpf: 'BiquadFilter',
+    amp: 'Gain'
+  });
+  
+  this.osc.to(this.lpf).to(this.amp).to(context.DAC);
+  this.osc.type = type;
+}
+
+Voice.prototype.setFilter = function (cutoff, reso) {
+  this.lpf.frequency.value = cutoff;
+  this.lpf.Q.value = reso;
+};
+
+
+/**
+ * Step 2: Implement AD envelope.
+ */
+Voice.prototype.noteOn = function (pitch, intensity, attack, decay) {
+  var freq = Spiral.mtof(pitch);
+  var now = this.context.now;
+
+  // Attack-Decay amp enveloping.
+  this.osc.frequency.setValueAtTime(freq, now);
+  this.amp.gain.setValueAtTime(0.0, now);
+  this.amp.gain.linearRampToValueAtTime(intensity, now + attack);
+  this.amp.gain.linearRampToValueAtTime(0.0, now + decay);
+
+  this.osc.start(now);
+  this.osc.stop(now + attack + decay);
+};
+
+
+/**
+ * Step 3: Design KeyEvent handler for polyphonic mechanism.
+ */
+function KeyEventHandler(context, controls) {
+
+  this.context = context;
+  this.controls = controls;
+
+  this.KEY2PITCH = {
+    '65': 60,   // C4
+    '87': 61,   // C#4
+    '83': 62,   // D4
+    '69': 63,   // D#4
+    '68': 64,   // E4
+    '70': 65,   // F4
+    '84': 66,   // F#4
+    '71': 67,   // G4
+    '89': 68,   // G#4
+    '72': 69,   // A4
+    '85': 70,   // A#4
+    '74': 71,   // B4
+    '75': 72    // C5
+  };
+
+  this.KEYS_PRESSED = [];
+
+  window.addEventListener('keydown', this.onKeyDown.bind(this));
+  window.addEventListener('keyup', this.onKeyUp.bind(this));
+}
+
+KeyEventHandler.prototype.onKeyDown = function (event) {
+  var keyCode = event.keyCode;
+  
+  // If the key is already pressed or there is no corresponding MIDI pitch,
+  // stop here.
+  if (this.KEYS_PRESSED[keyCode] || !this.KEY2PITCH[keyCode])
+    return;
+
+  this.KEYS_PRESSED[keyCode] = true;
+
+  var voice = new Voice(this.context, 'sawtooth');
+  voice.setFilter(this.controls.cutoff.getValue(), this.controls.reso.getValue());
+  voice.noteOn(this.KEY2PITCH[keyCode], 0.25, 
+    this.controls.attack.getValue(), this.controls.decay.getValue());
+};
+
+KeyEventHandler.prototype.onKeyUp = function (event) {
+  if (!this.KEYS_PRESSED[event.keyCode])
+    return;
+
+  this.KEYS_PRESSED[event.keyCode] = false;
+};
+
+
+// Create these as Global, yet this is a bad practice.
+var audioContext, keyEventHandler, knobs;
+
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  audioContext = new AudioContext();
+
+  // We cannot bind these knobs to AudioParam because AudioNodes are being
+  // created dynamically.
+  knobs = {
+    cutoff: document.getElementById('k-cutoff'),
+    reso: document.getElementById('k-reso'),
+    attack: document.getElementById('k-attack'),
+    decay: document.getElementById('k-decay')
+  };
+
+  keyEventHandler = new KeyEventHandler(audioContext, knobs);
+
+});
+</script>
+
+</body>
+
+</html>
