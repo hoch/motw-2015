@@ -1,0 +1,17 @@
+{
+  "name": "my-first-music-app",
+  "version": "0.0.1",
+  "homepage": "https://my.home.come",
+  "authors": [
+    "johndoe@gmail.com"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.1",
+    "spiral": "hoch/spiral#~0.0.2"
+  }
+}

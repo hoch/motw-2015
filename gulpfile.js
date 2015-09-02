@@ -27,6 +27,7 @@ gulp.task('tuts', function () {
 
   gulp.watch([
     'tutorials/*.html',
+    'tutorials/assets/*.html',
     'tutorials/assets/*.js',
     'tutorials/assets/*.css'
   ], browserSync.reload);
@@ -43,6 +44,7 @@ gulp.task('app', function () {
 
   gulp.watch([
     'app/*.html',
+    'app/assets/*.html',
     'app/assets/*.js',
     'app/assets/*.css'
   ], browserSync.reload);
