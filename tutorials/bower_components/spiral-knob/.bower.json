@@ -1,0 +1,42 @@
+{
+  "name": "spiral-knob",
+  "version": "0.0.1",
+  "authors": [
+    "Hongchan Choi <hongchan.choi@gmail.com>"
+  ],
+  "description": "A Polymer element of an audio knob for Web Audio API AudioParam object",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "audio",
+    "spiral",
+    "web-audio",
+    "audioparam",
+    "knob"
+  ],
+  "main": "spiral-knob.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/hoch/spiral-knob/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.5",
+    "web-component-tester": "*"
+  },
+  "_release": "0.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.1",
+    "commit": "43f7ea9a786e79bfb1e268dd7547e01c608e1ef8"
+  },
+  "_source": "git://github.com/hoch/spiral-knob.git",
+  "_target": "~0.0.1",
+  "_originalSource": "hoch/spiral-knob"
+}

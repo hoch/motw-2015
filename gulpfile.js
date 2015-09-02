@@ -16,57 +16,23 @@ gulp.task('clean', del.bind(null, [
   '!app'
 ]));
 
-gulp.task('build-style', function () {
-  return gulp.src('src/css/*.css')
-    .pipe(plugins.cssmin())
-    .pipe(gulp.dest('app/css'));
-});
-
-gulp.task('build-script', function () {
-  return gulp.src('src/scripts/*.js')
-    .pipe(plugins.uglify({ mangle: false }))
-    .pipe(gulp.dest('app/scripts'));
-});
-
-gulp.task('build-asset', function () {
-  // TODO: add image optimization.
-  return gulp.src('src/assets/**/*')
-    .pipe(gulp.dest('app/assets'));
-});
-
-gulp.task('build-html', function () {
-  return gulp.src('src/*.html')
-    .pipe(gulp.dest('app'));
-});
-
-gulp.task('build-component', function () {
-  // TODO: add vulcanization.
-  return gulp.src('src/bower_components/**/*')
-    .pipe(gulp.dest('app/bower_components'));
-});
-
-gulp.task('build', function (cb) {
-  runSequence('clean', 
-    ['build-style', 'build-script', 'build-asset', 'build-html', 'build-component'], cb);
-});
-
-gulp.task('dev', function () {
+gulp.task('tuts', function () {
   browserSync.init({
     notify: false,
     server: {
-      baseDir: 'src'
+      baseDir: 'tutorials'
     },
     browser: 'google chrome'
   });
 
   gulp.watch([
-    'src/**/*.html',
-    'src/**/*.js',
-    'src/**/*.css'
+    'tutorials/*.html',
+    'tutorials/assets/*.js',
+    'tutorials/assets/*.css'
   ], browserSync.reload);
 });
 
-gulp.task('preview', function () {
+gulp.task('app', function () {
   browserSync.init({
     notify: false,
     server: {
@@ -76,11 +42,16 @@ gulp.task('preview', function () {
   });
 });
 
-gulp.task('deploy', function () {
+gulp.task('deploy-tuts', function () {
+  return gulp.src('tutorials/**/*')
+    .pipe(deploy());
+});
+
+gulp.task('deploy-app', function () {
   return gulp.src('app/**/*')
     .pipe(deploy());
 });
 
 gulp.task('default', function (cb) {
-  runSequence('build', 'preview', cb);
+  runSequence('app', cb);
 });
