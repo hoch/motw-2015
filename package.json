@@ -1,6 +1,6 @@
 {
   "name": "motw-2015",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The boilerplate project with code examples for MOTW 2015 workshop.",
   "author": "Hongchan Choi <hongchan.choi@gmail.com>",
   "devDependencies": {

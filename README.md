@@ -27,20 +27,16 @@ cd MY_DIR
 
 Make sure you are in __the project root directory__ before running the following commands.
 
-- Start up the dev server and do your work. Any change in the `src` directory will trigger _the refresh in the browser automatically._
+- Take a look around the workshop tutorials on the local development server. Stop the server when you're ready to write your own code.
 ~~~bash
-# start development server
-gulp dev          
+# start tutorial
+gulp tuts
 ~~~
 
-- When you want to check the actual preview of the web site, build and start the preview server. This will minify all the codes and consolidate the content into `app` directory.
+- Then start up the server and do your work. Any change in the `app` directory will trigger _the refresh in the browser automatically._
 ~~~bash
-# build site and start preview server
-gulp build
-gulp preview
-
-# Or simply do both by using the default task
-gulp
+# start development server
+gulp app
 ~~~
 
 ## Deployment
@@ -56,7 +52,6 @@ git remote set-url origin https://github.com/USERNAME/MY_REPO.git
 - Note that you have to build the application at least once to have the `app` directory ready.
 ~~~bash
 # Build the application and commit/push to master.
-gulp build
 git commit -am 'initial commit'
 git push origin master
 ~~~
@@ -64,7 +59,7 @@ git push origin master
 - If you are ready to upload the content, deploy the `app` directory to `gh-pages` branch with the following command. You might have to type your credential. If you're getting errors, consider [change the name of your directory](https://github.com/shinnn/gulp-gh-pages/issues/54).
 ~~~bash
 # Deploy site to gh-pages branch.
-$ gulp deploy
+$ gulp deploy-app
 ~~~
 
 To access the deployed site, open the URL in your browser. Change `USERNAME` and `MY_REPO` accordingly. For example, the deployed site of the current repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).

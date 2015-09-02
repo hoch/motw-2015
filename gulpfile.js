@@ -40,6 +40,12 @@ gulp.task('app', function () {
     },
     browser: 'google chrome'
   });
+
+  gulp.watch([
+    'app/*.html',
+    'app/assets/*.js',
+    'app/assets/*.css'
+  ], browserSync.reload);
 });
 
 gulp.task('deploy-tuts', function () {
