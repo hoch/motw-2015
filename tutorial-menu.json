@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Tutorial: Subtractive Synth",
+    "submenu": [
+      {
+        "title": "Step 1",
+        "url": "subtractive-step1.html",
+        "hash": "tutorials-subtractive-step1"
+      },
+      {
+        "title": "Step 2",
+        "url": "subtractive-step2.html",
+        "hash": "tutorials-subtractive-step2"
+      },
+      {
+        "title": "Step 3",
+        "url": "subtractive-step3.html",
+        "hash": "tutorials-subtractive-step3"
+      }
+    ]
+  }
+]

@@ -1,0 +1,77 @@
+[
+  {
+    "title": "Tutorial: Subtractive Synth",
+    "submenu": [
+      {
+        "title": "Step 1",
+        "url": "subtractive-step1.html",
+        "hash": "tutorials-subtractive-step1"
+      },
+      {
+        "title": "Step 2",
+        "url": "subtractive-step2.html",
+        "hash": "tutorials-subtractive-step2"
+      },
+      {
+        "title": "Step 3",
+        "url": "subtractive-step3.html",
+        "hash": "tutorials-subtractive-step3"
+      }
+    ]
+  },
+  {
+    "title": "Tutorial: Sampler",
+    "submenu": [
+      {
+        "title": "Step 1",
+        "url": "sampler-step1.html",
+        "hash": "tutorials-sampler-step1"
+      },
+      {
+        "title": "Step 2",
+        "url": "sampler-step2.html",
+        "hash": "tutorials-sampler-step2"
+      },
+      {
+        "title": "Step 3",
+        "url": "sampler-step3.html",
+        "hash": "tutorials-sampler-step3"
+      }
+    ]
+  },
+  {
+    "title": "Tutorial: Drum Pads",
+    "submenu": [
+      {
+        "title": "Step 1",
+        "url": "drumpads-step1.html",
+        "hash": "tutorials-drumpads-step1"
+      },
+      {
+        "title": "Step 2",
+        "url": "drumpads-step2.html",
+        "hash": "tutorials-drumpads-step2"
+      },
+      {
+        "title": "Step 3",
+        "url": "drumpads-step3.html",
+        "hash": "tutorials-drumpads-step3"
+      }
+    ]
+  },
+  {
+    "title": "Resources",
+    "submenu": [
+      {
+        "title": "Workshop Materials",
+        "url": "workshop-materials.html",
+        "hash": "workshop-materials"
+      },
+      {
+        "title": "Useful Links",
+        "url": "useful-links.html",
+        "hash": "useful-links"
+      }
+    ]
+  }
+]
