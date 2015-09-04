@@ -1,4 +1,5 @@
 .DS_Store
+.publish/
 node_modules/
 NOTES.md
 motw_install.log
