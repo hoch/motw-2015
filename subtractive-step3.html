@@ -83,7 +83,7 @@ Voice.prototype.setFilter = function (cutoff, reso) {
 };
 
 Voice.prototype.to = function (destination) {
-  this.amp.to(destination);
+  return this.amp.to(destination);
 };
 
 /**

@@ -1,0 +1,115 @@
+<!--
+  Tutorial 3-1: MIDI Inspector
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: MIDI | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+  <style>
+    .label {
+      display: inline-block;
+      width: 100px;
+      height: 30px;
+      line-height: 30px;
+      vertical-align: middle;
+    }
+
+    .value-display {
+      display: inline-block;
+      margin: 5px;
+      padding: 0 5px;
+      background-color: #eee;
+      width: 150px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 5px;
+      vertical-align: middle;
+    }
+
+    #log {
+      margin-top: 1em;
+      font-family: monospace;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="info">
+    <h1>MIDI</h1>
+    <h2>MIDI Inspector</h2>
+    <p class="description">Description here.</p>
+    <ol>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <div>
+      <span class="label">Event Type</span>
+      <span id="event-type" class="value-display"></span>
+    </div>
+    <div>
+      <span class="label">Data 1</span>
+      <span id="data-1" class="value-display"></span>
+    </div>
+    <div>
+      <span class="label">Data 2</span>
+      <span id="data-2" class="value-display"></span>
+    </div>
+    <div id="log">
+    </div>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+  
+<script id="tutorial-code">
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var doms = {
+    type: document.getElementById('event-type'),
+    data1: document.getElementById('data-1'),
+    data2: document.getElementById('data-2'),
+    log: document.getElementById('log')
+  };
+
+  var dummyTarget = {
+    onmidimessage: function (message) {
+      doms.type.textContent = message.type;
+      doms.data1.textContent = message.data1;
+      doms.data2.textContent = message.data2;
+
+      var div = document.createElement('div');
+      div.textContent = message.type + ':' + message.data1 + ':' + message.data2;
+      doms.log.appendChild(div);
+
+      if (doms.log.childNodes.length > 25)
+        doms.log.removeChild(doms.log.childNodes[0]);
+    }
+  };
+
+  Spiral.createMIDIManager().start().then(function (MIDI) {
+
+    MIDI.defineTarget('dummy', dummyTarget);
+    MIDI.connectAll().to('dummy');
+
+  });
+
+});
+</script>
+
+</body>
+
+</html>

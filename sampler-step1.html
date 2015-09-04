@@ -1,0 +1,97 @@
+<!--
+  Tutorial 1: Sampler, Step 1
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Sampler | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+  <style>
+    textarea {
+      background-color: #eee;
+      width: 50%;
+      margin: 0 auto;
+      height: 200px;
+      font-size: 1.5em;
+      font-family: monospace;
+      resize: none;
+      border: 0;
+    }
+
+    textarea:focus {
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="info">
+    <h1>Sampler</h1>
+    <h2>Step 1: Type Writer</h2>
+    <p class="description">Make the text area chirp!</p>
+    <ol>
+      <li>Load more than one sample.</li>
+      <li>Associate a different sound to the different key.</li>
+      <li>Create a <code>Sampler</code> singleton object for the application.</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <textarea id="writer"></textarea>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+  
+<script id="tutorial-code">
+
+
+function tick(context, buffer) {
+  var src = context.createBufferSource();
+  var amp = context.createGain();
+  src.to(amp).to(context.DAC);
+
+  var now = context.now;
+  src.buffer = buffer;
+  src.start(now);
+  src.stop(now + buffer.duration);
+}
+
+
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var audioFile = [
+    { name: 'tick', url: 'sounds/tw-001.wav' },
+    { name: 'tack', url: 'sounds/tw-002.wav' },
+    { name: 'zip', url: 'sounds/tw-003.wav' }
+  ];
+
+  var context = new AudioContext();
+
+  context.loadAudioFiles(audioFile, function() {}).then(function (buffers) {
+
+    // Start listening the keydown event.
+    document.getElementById('writer').addEventListener('keydown', function (event) {
+      if (event.keyCode === 13) {
+        tick(context, buffers.get('zip'));
+        return;
+      }
+
+      tick(context, buffers.get(Math.random() > 0.5 ? 'tick' : 'tack'));
+    });
+
+  }, function () {});
+});
+</script>
+
+</body>
+
+</html>

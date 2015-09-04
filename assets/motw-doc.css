@@ -60,16 +60,26 @@ h2 {
   line-height: 50px;
 }
 
+a, a:active, a:visited {
+  text-decoration: none;
+  color: #DD2C00;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #FF6E40; 
+}
+
 .info .description {
   margin-top: 40px;
   font-size: 1.2em;
 }
 
-.info ol {
+.info ol, .info ul {
   padding: 0 30px;
 }
 
-.info ol li {
+.info ol li, .info ul li {
   line-height: 1.8em;
 }
 
