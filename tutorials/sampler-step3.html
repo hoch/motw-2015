@@ -1,0 +1,157 @@
+<!--
+  Tutorial 1: Sampler, Step 3
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Sampler | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+</head>
+
+<body>
+  
+  <div class="info">
+    <h1>Sampler</h1>
+    <h2>Step 3</h2>
+    <p class="description">A simple PCM sampler with few controls.</p>
+    <ol>
+      <li>Create <code>SampleVoice</code> class for the individual sample playback.</li>
+      <li>Use <code>keydown</code> event to trigger different samples with the associated key.</li>
+      <li>Create a <code>Sampler</code> singleton object for the application.</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <spiral-knob id="k-mix" label="Mix" value="0.75" min-value="0.0" max-value="1.0"></spiral-knob>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+  
+<script id="tutorial-code">
+
+
+function SampleVoice(context, buffer) {
+  context.createNodes(this, {
+    src: 'BufferSource',
+    amp: 'Gain'
+  });
+
+  this.src.to(this.amp);
+  this.src.buffer = buffer;
+}
+
+SampleVoice.prototype.to = function (destination) {
+  return this.amp.to(destination);
+};
+
+SampleVoice.prototype.noteOn = function (intensity, when) {
+  this.amp.gain.value = intensity;
+  this.src.start(when);
+  this.src.stop(when + this.src.buffer.duration);
+};
+
+
+
+function Sampler(context) {
+  this.context = context;
+
+  this.isReady = false;
+  this.buffers = null;
+  
+  this.audioFiles = [
+    { name: 'snare', url:'sounds/sd-001.mp3' },
+    { name: 'kick', url:'sounds/kd-001.mp3' },
+    { name: 'hihat', url:'sounds/hh-001.mp3' },
+    { name: 'reverbIR', url:'sounds/960-BriteStage.mp3' }
+  ];
+
+  this.keymap = {
+    '16': 'kick',     // shift
+    '13': 'snare',    // enter
+    '190': 'hihat',   // period  
+    '191': 'hihat',   // period  
+  };
+
+  context.createNodes(this, {
+    efx: 'Gain',
+    wet: 'Gain',
+    dry: 'Gain',
+    reverb: 'Convolver',
+    output: 'Gain'
+  });
+
+  this.efx.to(this.wet, this.dry);
+  this.dry.to(this.output);
+  this.wet.to(this.reverb).to(this.output);
+
+  this.initialize();
+}
+
+Sampler.prototype.initialize = function () {
+  this.context.loadAudioFiles(this.audioFiles, function () {}).then(
+    function (buffers) {
+      this.buffers = buffers;
+      this.reverb.buffer = this.buffers.get('reverbIR');
+      this.isReady = true;
+    }.bind(this),
+    function () {}
+  ); 
+};
+
+Sampler.prototype.to = function (destination) {
+  return this.output.to(destination);
+};
+
+Sampler.prototype.playSample = function (keyCode) {
+  if (!this.isReady || !this.keymap.hasOwnProperty(keyCode))
+    return;
+
+  var bufferName = this.keymap[keyCode];
+  var voice = new SampleVoice(this.context, this.buffers.get(bufferName));
+  voice.to(this.efx);
+  voice.noteOn(0.75, this.context.now);
+};
+
+Sampler.prototype.setMix = function (mix) {
+  this.wet.gain.value = mix;
+  this.dry.gain.value = 1.0 - mix;
+};
+
+Sampler.prototype.postMessage = function (which, eventType, data) {
+  if (eventType === 'touched')
+    this.setMix(data.value);
+};
+
+
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var context = new AudioContext();
+  var sampler = new Sampler(context);
+
+  sampler.to(context.DAC);
+
+  var knobs = {
+    mix: document.getElementById('k-mix')
+  };
+
+  knobs.mix.setController(sampler);
+  sampler.setMix(knobs.mix.getValue());
+
+  window.addEventListener('keydown', function (event) {
+    sampler.playSample(event.keyCode);
+  });
+  
+});
+</script>
+
+</body>
+
+</html>

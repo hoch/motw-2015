@@ -1,6 +1,6 @@
 # MOTW Workshop: Boilerplate Project
 
-This repository is the boilerplate project for Musicking on the Web workshop. The MOTW workshop 2015 will be hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) and be a part of [Music 220A](https://ccrma.stanford.edu/courses/220a/) class at [CCRMA](https://ccrma.stanford.edu) at Stanford University.
+This repository is the boilerplate project for "Musicking on the Web" workshop. The MOTW workshop 2015 will be hosted by [Google Campus Seoul](https://www.campus.co/seoul/ko) and be a part of [Music 220A](https://ccrma.stanford.edu/courses/220a/) class at [CCRMA](https://ccrma.stanford.edu) at Stanford University.
 
 ## Prerequisites
 - [Git](https://git-scm.com/)
@@ -11,7 +11,7 @@ This repository is the boilerplate project for Musicking on the Web workshop. Th
 Note that the installation of these prerequisites may require the system admin privileges.
 
 ## Get the code
-Run the command in the terminal. Be creative on your directory name:
+Run the command in the terminal. Be creative with your directory name:
 ~~~
 git clone https://github.com/hoch/motw-2015.git MY_DIR
 ~~~
@@ -27,13 +27,13 @@ cd MY_DIR
 
 Make sure you are in __the project root directory__ before running the following commands.
 
-- Take a look around the workshop tutorials on the local development server. Stop the server when you're ready to write your own code.
+- Take a look around the workshop tutorials on the local tutorial server. Stop the server when you're ready to write your own code.
 ~~~bash
-# start tutorial
+# start tutorial server
 gulp tuts
 ~~~
 
-- Then start up the server and do your work. Any change in the `app` directory will trigger _the refresh in the browser automatically._
+- Then start up the development server and do your work. Any change in the `app` directory will trigger _the refresh in the browser automatically._
 ~~~bash
 # start development server
 gulp app
@@ -56,13 +56,13 @@ git commit -am 'initial commit'
 git push origin master
 ~~~
 
-- If you are ready to upload the content, deploy the `app` directory to `gh-pages` branch with the following command. You might have to type your credential. If you're getting errors, consider [change the name of your directory](https://github.com/shinnn/gulp-gh-pages/issues/54).
+- If you are ready to upload the content, deploy the `app` directory to `gh-pages` branch with the following command. You might have to type your credential in the process. If you're getting errors, consider [change the name of your directory](https://github.com/shinnn/gulp-gh-pages/issues/54).
 ~~~bash
 # Deploy site to gh-pages branch.
 $ gulp deploy-app
 ~~~
 
-To access the deployed site, open the URL in your browser. Change `USERNAME` and `MY_REPO` accordingly. For example, the deployed site of the current repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).
+To access the deployed site, open the URL in your browser. Make sure to change `USERNAME` and `MY_REPO` accordingly. For example, the deployed site of the current repository is [https://hoch.github.io/motw-2015](https://hoch.github.io/motw-2015).
 ~~~
 https://USERNAME.github.io/MY_REPO
 ~~~

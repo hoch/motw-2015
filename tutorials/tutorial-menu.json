@@ -48,9 +48,9 @@
         "hash": "midi-inspector"
       },
       {
-        "title": "Step 2",
-        "url": "sampler-step2.html",
-        "hash": "tutorials-sampler-step2"
+        "title": "Drumpad",
+        "url": "midi-drumpad.html",
+        "hash": "midi-drumpad"
       },
       {
         "title": "Step 3",
