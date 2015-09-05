@@ -15,7 +15,7 @@
 </head>
 
 <body>
-  
+
   <div class="info">
     <h1>Subtractive Synthesizer</h1>
     <h2>Step 1</h2>
@@ -35,15 +35,15 @@
 
   <div id="code-viewer">
   </div>
-  
+
 <script id="tutorial-code">
 window.addEventListener('WebComponentsReady', function () {
-  
+
   /**
    * Step 1: Creating an audiograph for the subtractive synthesis.
    *
    * Subtractive synthesis starts with a rich tone and cut out the spectral
-   * content you do not need. A sawtooth oscillator and a low pass filter is a 
+   * content you do not need. A sawtooth oscillator and a low pass filter is a
    * typical combination for the task.
    */
 
@@ -66,7 +66,7 @@ window.addEventListener('WebComponentsReady', function () {
    * Step 2: Use |keydown| event to trigger the change of oscillator's pitch.
    *
    * Convert the key code from the key event to MIDI pitch. Then convert it again
-   * to the frequency for the oscillator. 
+   * to the frequency for the oscillator.
    *
    * Q) Can you implement noteOn/noteOff like a monophonic synthesizer?
    */

@@ -27,9 +27,23 @@ gulp.task('tuts', function () {
 
   gulp.watch([
     'tutorials/*.html',
-    'tutorials/assets/*.html',
-    'tutorials/assets/*.js',
-    'tutorials/assets/*.css'
+    'tutorials/assets/*'
+  ], browserSync.reload);
+});
+
+// delete this before pushing to the origin master
+gulp.task('ans', function () {
+  browserSync.init({
+    notify: false,
+    server: {
+      baseDir: 'tutorials_ans'
+    },
+    browser: 'google chrome'
+  });
+
+  gulp.watch([
+    'tutorials_ans/*.html',
+    'tutorials_ans/assets/*'
   ], browserSync.reload);
 });
 
