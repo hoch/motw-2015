@@ -1,0 +1,215 @@
+<!--
+  Tutorial: Subtractive Synthesizer - Modulation
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Subtractive Synth | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+</head>
+
+<body>
+
+  <div class="info">
+    <h1>Subtractive Synth</h1>
+    <h2>Modulation</h2>
+    <p class="description">Desgin </p>
+    <ol>
+      <li>Design <code>Voice</code> class for the better control.</li>
+      <li>Implement AD envelope.</li>
+      <li>How to capture note on/off events nicely.</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <spiral-knob id="k-cutoff" label="Cutoff" value="250" min-value="60" max-value="1000"></spiral-knob>
+    <spiral-knob id="k-reso" label="Reso" value="1.0" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-attack" label="Attack" value="0.05" min-value="0.01" max-value="0.25"></spiral-knob>
+    <spiral-knob id="k-decay" label="Decay" value="0.25" min-value="0.01" max-value="2.0"></spiral-knob>
+    <div class="param-divider"></div>
+    <spiral-knob id="k-rate" label="Vib Rate" value="1" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-depth" label="Vib Depth" value="50" min-value="0" max-value="500"></spiral-knob>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+
+<script id="tutorial-code">
+
+/**
+ * TASK 1: Design |SawVoice| class as a minimum unit of subtrative synthesizer.
+ */
+
+function SawVoice(context) {
+  this._context = context;
+
+  /**
+   * 1.1 Create an sawtooth oscillator, a biquad filter and an amplifier. Also
+   *   add an extra oscillator and gain node for the modulation control.
+   */
+  this._context.createNodes(this, {
+    lfo: 'Oscillator',
+    depth: 'Gain',
+    osc: 'Oscillator',
+    lpf: 'BiquadFilter',
+    amp: 'Gain'
+  });
+
+  /**
+   * 1.2 Build an audiograph that implments the filter modulation.
+   */
+  this.osc.to(this.lpf).to(this.amp);
+  this.lfo.to(this.depth).to(this.lpf.frequency);
+  this.osc.type = 'sawtooth';
+}
+
+SawVoice.prototype.to = function (destination) {
+  return this.amp.to(destination);
+};
+
+SawVoice.prototype.setParams = function (params) {
+  /**
+   * 1.3 Sets the parameters: lfo rate, lfo depth, cutoff, and reso.
+   */
+  this.lfo.frequency.value = params.rate;
+  this.depth.gain.value = params.depth;
+  this.lpf.frequency.value = params.cutoff;
+  this.lpf.Q.value = params.reso;
+}
+
+SawVoice.prototype.noteOn = function (pitch, amp, attack, decay) {
+  /**
+   * 1.4 Implement .noteOn() with the attack/decay envelope control.
+   */
+  var now = this._context.now;
+  this.lfo.start(now);
+  this.osc.frequency.value = Spiral.mtof(pitch);
+  this.amp.gain.setValueAtTime(0.0, now);
+  this.amp.gain.linearRampToValueAtTime(amp, now + attack);
+  this.amp.gain.linearRampToValueAtTime(0.0, now + attack + decay);
+  this.osc.start(now);
+  this.osc.stop(now + attack + decay);
+};
+
+
+/**
+ * TASK 2: Implement KeyboardHandler singleton object.
+ */
+
+var keyboardHandler = {
+
+  _keymap: {
+    '65': 60,   // C4
+    '87': 61,   // C#4
+    '83': 62,   // D4
+    '69': 63,   // D#4
+    '68': 64,   // E4
+    '70': 65,   // F4
+    '84': 66,   // F#4
+    '71': 67,   // G4
+    '89': 68,   // G#4
+    '72': 69,   // A4
+    '85': 70,   // A#4
+    '74': 71,   // B4
+    '75': 72    // C5
+  },
+
+  _states: [],
+
+  /**
+   * 2.1 Implement keydown event handler. Filter out 1) any invalid keyCode and
+   *   the key that is already pressed.
+   */
+  _handleKeyDown: function (event) {
+    var keyCode = event.keyCode;
+    if (!this._keymap[keyCode] || this._states[keyCode])
+      return;
+
+    this._states[keyCode] = true;
+
+    if (this.notify)
+      this.notify('noteon', this._keymap[keyCode]);
+  },
+
+  /**
+   * 2.2 Implement keyup event handler. Filter out 1) any invalid keyCode and
+   *   the key that is already released.
+   */
+  _handleKeyUp: function (event) {
+    var keyCode = event.keyCode;
+    if (!this._keymap[keyCode] || !this._states[keyCode])
+      return;
+
+    this._states[keyCode] = false;
+
+    if (this.notify)
+      this.notify('noteoff', this._keymap[keyCode]);
+  },
+
+  startListen: function () {
+    window.addEventListener('keydown', this._handleKeyDown.bind(this));
+    window.addEventListener('keyup', this._handleKeyUp.bind(this));
+  },
+
+  notify: null
+
+};
+
+
+// Entry Point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var context = new AudioContext();
+
+  var knobs = {
+    rate: document.getElementById('k-rate'),
+    depth: document.getElementById('k-depth'),
+    cutoff: document.getElementById('k-cutoff'),
+    reso: document.getElementById('k-reso'),
+    attack: document.getElementById('k-attack'),
+    decay: document.getElementById('k-decay')
+  };
+
+  /**
+   * TASK 3: Implement an event handler.
+   */
+  keyboardHandler.notify = function (type, pitch) {
+    switch (type) {
+
+      /**
+       * 3.1 Design 'noteon' event handler: create a voice instance and set
+       *   associated parameters. Then start a voice with envelope parameters.
+       */
+      case 'noteon':
+        var voice = new SawVoice(context);
+        voice.to(context.DAC);
+        voice.setParams({
+          rate: knobs.rate.getValue(),
+          depth: knobs.depth.getValue(),
+          cutoff: knobs.cutoff.getValue(),
+          reso: knobs.reso.getValue()
+        });
+        voice.noteOn(pitch, 0.707, 
+          knobs.attack.getValue(), knobs.decay.getValue());
+        break;
+      
+      case 'noteoff':
+        // No action for now.
+        break;
+    }
+  };
+
+  keyboardHandler.startListen();
+
+});
+</script>
+
+</body>
+
+</html>

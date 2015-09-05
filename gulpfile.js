@@ -31,22 +31,6 @@ gulp.task('tuts', function () {
   ], browserSync.reload);
 });
 
-// delete this before pushing to the origin master
-gulp.task('ans', function () {
-  browserSync.init({
-    notify: false,
-    server: {
-      baseDir: 'tutorials_ans'
-    },
-    browser: 'google chrome'
-  });
-
-  gulp.watch([
-    'tutorials_ans/*.html',
-    'tutorials_ans/assets/*'
-  ], browserSync.reload);
-});
-
 gulp.task('app', function () {
   browserSync.init({
     notify: false,
