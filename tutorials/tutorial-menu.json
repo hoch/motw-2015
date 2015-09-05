@@ -51,11 +51,16 @@
         "title": "Drumpad",
         "url": "midi-drumpad.html",
         "hash": "midi-drumpad"
-      },
+      }
+    ]
+  },
+  {
+    "title": "Tutorial: UI",
+    "submenu": [
       {
-        "title": "Step 3",
-        "url": "sampler-step3.html",
-        "hash": "tutorials-sampler-step3"
+        "title": "Slida!",
+        "url": "ui-slida-main.html",
+        "hash": "ui-slida-main"
       }
     ]
   },
