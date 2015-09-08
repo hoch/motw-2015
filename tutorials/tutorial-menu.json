@@ -23,19 +23,19 @@
     "title": "Tutorial: Sampler",
     "submenu": [
       {
-        "title": "Step 1",
-        "url": "sampler-step1.html",
-        "hash": "tutorials-sampler-step1"
+        "title": "Type Writer",
+        "url": "typewriter.html",
+        "hash": "typewriter"
       },
       {
-        "title": "Step 2",
-        "url": "sampler-step2.html",
-        "hash": "tutorials-sampler-step2"
+        "title": "Drummin'",
+        "url": "drummin.html",
+        "hash": "drummin"
       },
       {
-        "title": "Step 3",
-        "url": "sampler-step3.html",
-        "hash": "tutorials-sampler-step3"
+        "title": "Grraaiinnzz",
+        "url": "grainz.html",
+        "hash": "grainz"
       }
     ]
   },

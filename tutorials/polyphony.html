@@ -1,5 +1,5 @@
 <!--
-  Tutorial 1: Subtractive Synthesizer, Step 3
+  Tutorial 1: Subtractive Synthesizer - Polyphony
 -->
 
 <!doctype html>
@@ -15,27 +15,42 @@
 </head>
 
 <body>
-  
+
   <div class="info">
     <h1>Subtractive Synthesizer</h1>
-    <h2>Step 3</h2>
+    <h2>Polyphony</h2>
     <p class="description">Design a multi-oscillator polyphonic synthesizer with effects.</p>
     <ol>
-      <li>Expand <code>Voice</code> class for the multi-oscillator with detune.</li>
-      <li>Implement ADSR envelope with note on/off.</li>
-      <li>Add the global feedback delay effect.</li>
+      <li>Press a key to trigger a voice: <code>[ a, w, s, e, d, f, t, g, y, h, j, k ]</code></li>
+      <li>Tweak the mix balance of 3 oscillators and detune parameters.</li>
+      <li>Tweak envelopes for the filter and amplifier.</li>
+      <li>Tweak echo effect with the delay time and the feedback.</li>
     </ol>
   </div>
 
   <div class="workspace">
-    <spiral-knob id="k-cutoff" label="Cutoff" value="500" min-value="125" max-value="5000"></spiral-knob>
-    <spiral-knob id="k-reso" label="Reso" value="12.0" min-value="0.1" max-value="36"></spiral-knob>
+    <spiral-knob id="k-vol1" label="OSC1" value="0.4" min-value="0.0" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-vol2" label="OSC2" value="0.15" min-value="0.0" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-vol3" label="OSC3" value="0.15" min-value="0.0" max-value="1.0" size="small"></spiral-knob>
     <div class="param-divider"></div>
-    <spiral-knob id="k-attack" label="Attack" value="0.02" min-value="0.01" max-value="0.25"></spiral-knob>
-    <spiral-knob id="k-decay" label="Decay" value="0.1" min-value="0.01" max-value="1.0"></spiral-knob>
-    <spiral-knob id="k-sustain" label="Sustain" value="0.35" min-value="0.0" max-value="1.0"></spiral-knob>
-    <spiral-knob id="k-release" label="Release" value="0.35" min-value="0.01" max-value="5.0"></spiral-knob>
+    <spiral-knob id="k-tune2" label="Tune 2" value="10" min-value="-1200" max-value="1200" size="small"></spiral-knob>
+    <spiral-knob id="k-tune3" label="Tune 3" value="-10" min-value="-1200" max-value="1200" size="small"></spiral-knob>
     <div class="param-divider"></div>
+    <spiral-knob id="k-cutoff" label="Cutoff" value="500" min-value="125" max-value="5000" size="small"></spiral-knob>
+    <spiral-knob id="k-reso" label="Reso" value="12.0" min-value="0.1" max-value="36" size="small"></spiral-knob>
+    <br>
+    <spiral-knob id="k-fltA" label="Flt A" value="0.02" min-value="0.01" max-value="0.25" size="small"></spiral-knob>
+    <spiral-knob id="k-fltD" label="Flt D" value="0.1" min-value="0.01" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-fltS" label="Flt S" value="0.35" min-value="0.0" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-fltR" label="Flt R" value="0.35" min-value="0.01" max-value="5.0" size="small"></spiral-knob>
+    <div class="param-divider"></div>
+    <spiral-knob id="k-ampA" label="A" value="0.02" min-value="0.01" max-value="0.25" size="small"></spiral-knob>
+    <spiral-knob id="k-ampD" label="D" value="0.1" min-value="0.01" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-ampS" label="S" value="0.35" min-value="0.0" max-value="1.0" size="small"></spiral-knob>
+    <spiral-knob id="k-ampR" label="R" value="0.35" min-value="0.01" max-value="5.0" size="small"></spiral-knob>
+  </div>
+
+  <div class="workspace">
     <spiral-knob id="k-mix" label="Mix" value="0.25" min-value="0.0" max-value="1.0"></spiral-knob>
     <spiral-knob id="k-delay" label="Delay Time" value="0.125" min-value="0.005" max-value="3.0"></spiral-knob>
     <spiral-knob id="k-feedback" label="Feedback" value="0.35" min-value="0.01" max-value="0.99"></spiral-knob>
@@ -43,85 +58,112 @@
 
   <div id="code-viewer">
   </div>
-  
+
 <script id="tutorial-code">
 
 /**
- * Step 1: Expand Voice class with multi-oscillator with detune.
+ * TASK 1: Design |MultiVoice| class.
  */
-function Voice(context, masterEffect) {
-  this.context = context;
 
-  context.createNodes(this, {
+function MultiVoice(context) {
+  this._context = context;
+
+  /**
+   * 1.1 Build an audiograph with 3 oscillators, 3 gains for each oscillator,
+   *   one lowpass filter and the output amplifier.
+   */
+  this._context.createNodes(this, {
     osc1: 'Oscillator',
     osc2: 'Oscillator',
     osc3: 'Oscillator',
-    bal1: 'Gain',
-    bal2: 'Gain',
-    bal3: 'Gain',
+    vol1: 'Gain',
+    vol2: 'Gain',
+    vol3: 'Gain',
     lpf: 'BiquadFilter',
     amp: 'Gain'
   });
-  
-  this.osc1.to(this.bal1).to(this.lpf).to(this.amp);
-  this.osc2.to(this.bal2).to(this.lpf);
-  this.osc3.to(this.bal3).to(this.lpf);
+
+  this.osc1.to(this.vol1).to(this.lpf).to(this.amp);
+  this.osc2.to(this.vol2).to(this.lpf);
+  this.osc3.to(this.vol3).to(this.lpf);
 
   this.osc1.type = this.osc2.type = this.osc3.type = 'sawtooth';
-
-  // Experiment: detuning and balancing.
-  this.osc2.detune.value = -1190;
-  this.osc3.detune.value = 1210;
-  this.bal1.gain.value = 0.75;
-  this.bal2.gain.value = 0.5;
-  this.bal3.gain.value = 0.5;
 }
 
-Voice.prototype.setFilter = function (cutoff, reso) {
-  this.lpf.frequency.value = cutoff;
-  this.lpf.Q.value = reso;
-};
-
-Voice.prototype.to = function (destination) {
+MultiVoice.prototype.to = function (destination) {
   return this.amp.to(destination);
 };
 
+MultiVoice.prototype.setParams = function (params) {
+  this.vol1.gain.value = params.vol1;
+  this.vol2.gain.value = params.vol2;
+  this.vol3.gain.value = params.vol3;
+  this.osc2.detune.value = params.tune2;
+  this.osc3.detune.value = params.tune3;
+  this.lpf.Q.value = params.reso;
+};
+
 /**
- * Step 2: Implement ADSR envelope.
+ * 1.2 Implement noteOn() method.
+ *   - Besides the pitch and the intensity, use |params| property bag to pass
+ *     the relevant parameters.
+ *   - Exercise the envelope over the filter frequency and the amplifier gain.
  */
-Voice.prototype.noteOn = function (pitch, params) {
+MultiVoice.prototype.noteOn = function (pitch, intensity, params) {
   var freq = Spiral.mtof(pitch);
-  var now = this.context.now;
+  var now = this._context.now;
 
-  // Setting the oscillator pitch.
-  this.osc1.frequency.setValueAtTime(freq, now);
-  this.osc2.frequency.setValueAtTime(freq, now);
-  this.osc3.frequency.setValueAtTime(freq, now);
+  this.osc1.frequency.value = freq;
+  this.osc2.frequency.value = freq;
+  this.osc3.frequency.value = freq;
 
-  this.amp.gain.setValueAtTime(0.0, now);
-  this.amp.gain.linearRampToValueAtTime(params.intensity, now + params.attack);
-  this.amp.gain.linearRampToValueAtTime(params.sustain, now + params.attack + params.decay);
+  this.lpf.frequency
+    .step(params.cutoff, now)
+    .expo(params.cutoff * (1.0 + intensity), now + params.fltA)
+    .expo(params.cutoff * (1.0 + params.fltS), now + params.fltA + params.fltD);
+
+  this.amp.gain
+    .step(0.0, now)
+    .line(intensity, now + params.ampA)
+    .line(params.ampS * intensity, now + params.ampA + params.ampD);
+
+    this._envCap = now + params.ampA + params.ampD;
 
   this.osc1.start(now);
   this.osc2.start(now);
   this.osc3.start(now);
 };
 
-Voice.prototype.noteOff = function (release) {
-  var now = this.context.now;
-  this.amp.gain.linearRampToValueAtTime(0.0, now + release);
-  this.osc1.stop(now + release);
-  this.osc2.stop(now + release);
-  this.osc3.stop(now + release);
+/**
+ * 1.3 Implement noteOff() method.
+ *   - Use the property bag as shown above.
+ *   - Start the release phase on the filter and the amplifier.
+ */
+MultiVoice.prototype.noteOff = function (params) {
+  var releaseStart = this._context.now;
+
+  if (releaseStart < this._envCap)
+    releaseStart = this._envCap;
+  
+  // TODO: slew complains about negative time constant. fix Spiral.
+  // console.log(params.cutoff, releaseStart, params.ampR);
+  // this.lpf.frequency.slew(params.cutoff, releaseStart, params.ampR);
+  
+  this.amp.gain.slew(0.0, releaseStart, params.ampR);
+
+  this.osc1.stop(releaseStart + params.ampR);
+  this.osc2.stop(releaseStart + params.ampR);
+  this.osc3.stop(releaseStart + params.ampR);
 };
 
 
 /**
- * Step 3: Global Echo effect processor.
+ * TASK 2: Desgin |Echo| class encasulates the feedback delay.
  */
-function EchoProcessor(context) {
+function Echo(context) {
+  this._context = context;
 
-  context.createNodes(this, {
+  this._context.createNodes(this, {
     'input': 'Gain',
     'wet': 'Gain',
     'dry': 'Gain',
@@ -133,24 +175,17 @@ function EchoProcessor(context) {
   this.input.to(this.wet, this.dry);
   this.wet.to(this.dly).to(this.fbk).to(this.dly).to(this.output);
   this.dry.to(this.output);
+}
 
-  this.dly.delayTime.value = 0.5;
-  this.fbk.gain.value = 0.5;
-};
-
-EchoProcessor.prototype.to = function (destination) {
-  this.output.to(destination);
+Echo.prototype.to = function (destination) {
+  return this.output.to(destination);
 };
 
 
-function KeyEventHandler(context, effect, controls) {
+// Use KeyboardHandler from the |modulation| tutorial.
+var KeyboardHandler = {
 
-  this.context = context;
-  this.effect = effect;
-  this.controls = controls;
-
-  this.KEYS_PRESSED = [];
-  this.KEY2PITCH = {
+  _keymap: {
     '65': 60,   // C4
     '87': 61,   // C#4
     '83': 62,   // D4
@@ -164,73 +199,125 @@ function KeyEventHandler(context, effect, controls) {
     '85': 70,   // A#4
     '74': 71,   // B4
     '75': 72    // C5
-  };
+  },
 
-  window.addEventListener('keydown', this.onKeyDown.bind(this));
-  window.addEventListener('keyup', this.onKeyUp.bind(this));
+  _states: [],
+
+  _handleKeyDown: function (event) {
+    var keyCode = event.keyCode;
+    if (!this._keymap[keyCode] || this._states[keyCode])
+      return;
+
+    this._states[keyCode] = true;
+
+    if (this.notify)
+      this.notify('noteon', this._keymap[keyCode]);
+  },
+
+  _handleKeyUp: function (event) {
+    var keyCode = event.keyCode;
+    if (!this._keymap[keyCode] || !this._states[keyCode])
+      return;
+
+    this._states[keyCode] = false;
+
+    if (this.notify)
+      this.notify('noteoff', this._keymap[keyCode]);
+  },
+
+  startListen: function () {
+    window.addEventListener('keydown', this._handleKeyDown.bind(this));
+    window.addEventListener('keyup', this._handleKeyUp.bind(this));
+  },
+
+  notify: null
+
+};
+
+
+/**
+ * Bonus: Implement createKnobs().
+ *   - With the array of ID strings as an argument, create an object of 
+ *     { 'name': elementID } pairs and return it.
+ */
+function createKnobs(domIds) {
+  var elements = {};
+  for (var i = 0; i < domIds.length; i++) {
+    var knobName = domIds[i].split('-')[1];
+    elements[knobName] = document.getElementById(domIds[i]);
+  }
+  return elements;
 }
-
-KeyEventHandler.prototype.onKeyDown = function (event) {
-  var keyCode = event.keyCode;
-  
-  // If the key is already pressed or there is no corresponding MIDI pitch,
-  // stop here.
-  if (this.KEYS_PRESSED[keyCode] || !this.KEY2PITCH[keyCode])
-    return;
-
-  var voice = new Voice(this.context);
-  voice.to(this.effect.input);
-
-  var params = {
-    intensity: 0.5,
-    attack: this.controls.attack.getValue(),
-    decay: this.controls.decay.getValue(),
-    sustain: this.controls.sustain.getValue()
-  };
-
-  voice.setFilter(this.controls.cutoff.getValue(), this.controls.reso.getValue());
-  voice.noteOn(this.KEY2PITCH[keyCode] - 12, params);
-
-  this.KEYS_PRESSED[keyCode] = voice;
-};
-
-KeyEventHandler.prototype.onKeyUp = function (event) {
-  if (!this.KEYS_PRESSED[event.keyCode])
-    return;
-
-  this.KEYS_PRESSED[event.keyCode].noteOff(this.controls.release.getValue());
-  this.KEYS_PRESSED[event.keyCode] = null;
-};
 
 
 // Entry point.
 window.addEventListener('WebComponentsReady', function () {
 
-  var audioContext = new AudioContext();
+  var context = new AudioContext();
 
-  
-  // We cannot bind these knobs to AudioParam because AudioNodes are being
-  // created dynamically. These parameters will be set at the onset of note.
-  var knobs = {
-    cutoff: document.getElementById('k-cutoff'),
-    reso: document.getElementById('k-reso'),
-    attack: document.getElementById('k-attack'),
-    decay: document.getElementById('k-decay'),
-    sustain: document.getElementById('k-sustain'),
-    release: document.getElementById('k-release'),
-    mix: document.getElementById('k-mix'),
-    delay: document.getElementById('k-delay'),
-    feedback: document.getElementById('k-feedback'),
-  };
+  var knobs = createKnobs([
+    'k-vol1', 'k-vol2', 'k-vol3',
+    'k-tune2', 'k-tune3', 'k-cutoff', 'k-reso',
+    'k-fltA', 'k-fltD', 'k-fltS', 'k-fltR',
+    'k-ampA', 'k-ampD', 'k-ampS', 'k-ampR',
+    'k-mix', 'k-delay', 'k-feedback'
+  ]);
 
-  var echo = new EchoProcessor(audioContext);
-  echo.to(audioContext.destination);
+  var echo = new Echo(context);
+  echo.to(context.DAC);
 
   knobs.mix.bind(echo.wet.gain);
   knobs.delay.bind(echo.dly.delayTime);
   knobs.feedback.bind(echo.fbk.gain);
 
-  var keyEventHandler = new KeyEventHandler(audioContext, echo, knobs);
+  var voices = [];
+
+  /**
+   * TASK 3: Implement notify() event handler.
+   *   - Based on the |type|, perform 'noteon' or 'noteoff' accordingly.
+   *   - Handle the polyphonic behavior.
+   */
+  KeyboardHandler.notify = function (type, pitch) {
+    switch (type) {
+      case 'noteon':
+        var voice = new MultiVoice(context);
+        voice.to(echo.input);
+        
+        voice.setParams({
+          vol1: knobs.vol1.getValue(),
+          vol2: knobs.vol2.getValue(),
+          vol3: knobs.vol3.getValue(),
+          tune2: knobs.tune2.getValue(),
+          tune3: knobs.tune3.getValue(),
+          reso: knobs.reso.getValue()
+        });
+
+        voice.noteOn(pitch, 0.707, {
+          cutoff: knobs.cutoff.getValue(),
+          fltA: knobs.fltA.getValue(),
+          fltD: knobs.fltD.getValue(),
+          fltS: knobs.fltS.getValue(),
+          ampA: knobs.ampA.getValue(),
+          ampD: knobs.ampD.getValue(),
+          ampS: knobs.ampS.getValue()
+        });
+          
+        voices[pitch] = voice;
+        break;
+
+      case 'noteoff':
+        voices[pitch].noteOff({
+          cutoff: knobs.cutoff.getValue(),
+          fltR: knobs.fltR.getValue(),
+          ampR: knobs.ampR.getValue()
+        });
+        
+        voices[pitch] = null;
+        break;
+      }
+  };
+
+  KeyboardHandler.startListen();
 
 });
 </script>

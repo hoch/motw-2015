@@ -1,5 +1,5 @@
 <!--
-  Tutorial 1: Sampler, Step 1
+  Tutorial 1: Sampler - Type Writer
 -->
 
 <!doctype html>
@@ -15,7 +15,7 @@
   <style>
     textarea {
       background-color: #eee;
-      width: 50%;
+      width: 70%;
       margin: 0 auto;
       height: 200px;
       font-size: 1.5em;
@@ -34,12 +34,11 @@
   
   <div class="info">
     <h1>Sampler</h1>
-    <h2>Step 1: Type Writer</h2>
-    <p class="description">Make the text area chirp!</p>
+    <h2>Type Writer</h2>
+    <p class="description">Simple, yet fun to play.</p>
     <ol>
-      <li>Load more than one sample.</li>
-      <li>Associate a different sound to the different key.</li>
-      <li>Create a <code>Sampler</code> singleton object for the application.</li>
+      <li>Type anything in the text area below.</li>
+      <li>Type <code>enter</code> will trigger a different sound.</li>
     </ol>
   </div>
 
@@ -52,7 +51,11 @@
   
 <script id="tutorial-code">
 
-
+/**
+ * TASK 1: Design |tick| method.
+ *   - Start and stop the passed AudioBuffer object with the context.
+ *   - Why don't we do this on-the-fly without creating a class?
+ */
 function tick(context, buffer) {
   var src = context.createBufferSource();
   var amp = context.createGain();
@@ -68,27 +71,66 @@ function tick(context, buffer) {
 // Entry point.
 window.addEventListener('WebComponentsReady', function () {
 
-  var audioFile = [
-    { name: 'tick', url: 'sounds/tw-001.wav' },
-    { name: 'tack', url: 'sounds/tw-002.wav' },
-    { name: 'zip', url: 'sounds/tw-003.wav' }
-  ];
+  /**
+   * TASK 2: Design singleton |TypeWriter| object.
+   */
+  var TypeWriter = {
 
-  var context = new AudioContext();
+    context: new AudioContext(),
+    textarea: document.getElementById('writer'),
 
-  context.loadAudioFiles(audioFile, function() {}).then(function (buffers) {
+    files: [
+      { name: 'tick', url: 'sounds/tw-001.wav' },
+      { name: 'tack', url: 'sounds/tw-002.wav' },
+      { name: 'zip', url: 'sounds/tw-003.wav' }
+    ],
 
-    // Start listening the keydown event.
-    document.getElementById('writer').addEventListener('keydown', function (event) {
-      if (event.keyCode === 13) {
-        tick(context, buffers.get('zip'));
-        return;
-      }
+    buffers: null,
 
-      tick(context, buffers.get(Math.random() > 0.5 ? 'tick' : 'tack'));
-    });
+    /**
+     * 2.1 Implement |startLinsten| method.
+     *   - Start listening 'keydown' event to trigger the type writer sample
+     *     accordingly.
+     */
+    startListen: function () {
+      this.textarea.addEventListener('keydown', function (event) {
+        var bufferName;
+        if (event.keyCode === 13)
+          bufferName = 'zip';
+        else
+          bufferName = Math.random() > 0.5 ? 'tick' : 'tack';
 
-  }, function () {});
+        tick(this.context, this.buffers.get(bufferName));
+      }.bind(this));
+    },
+
+    onprogress: function (filename) {
+      console.log(filename + ' loaded.');
+    },
+
+    onresolve: function (buffers) {
+      this.buffers = buffers;
+      this.startListen();
+    },
+
+    onreject: function () {
+      console.log('Beware! Something went wrong!');
+    },
+
+    /**
+     * 2.2 Implement |initialize| method.
+     *   - Use |context.loadAudioFiles()| method to load multiple files.
+     *   - Plug the promise resolution/rejection accordingly.
+     */
+    initialize: function () {
+      this.context.loadAudioFiles(this.files, this.onprogress.bind(this)).then(
+        this.onresolve.bind(this), this.onreject.bind(this));
+    }
+
+  };
+
+  TypeWriter.initialize();
+
 });
 </script>
 

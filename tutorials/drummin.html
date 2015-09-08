@@ -1,0 +1,247 @@
+<!--
+  Tutorial 1: Sampler - Drummin'
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Sampler | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+</head>
+
+<body>
+  
+  <div class="info">
+    <h1>Sampler</h1>
+    <h2>Drummin'</h2>
+    <p class="description">A simple PCM Drum sampler with few controls.</p>
+    <ol>
+      <li></li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <span class="sample"></span>
+    <spiral-knob id="k-speed" label="speed" value="1.0" min-value="0.01" max-value="2.0"></spiral-knob>
+    <spiral-knob id="k-attack" label="Attack" value="0.02" min-value="0.01" max-value="0.25"></spiral-knob>
+    <spiral-knob id="k-decay" label="Decay" value="0.1" min-value="0.01" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-amp" label="Volume" value="0.75" min-value="0.0" max-value="1.0"></spiral-knob>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+  
+<script id="tutorial-code">
+
+/**
+ * TASK 1: Design |DrumVoice| class.
+ *   - Use the same design as SawVoice in the previous tutorial.
+ */
+function DrumVoice(context, buffer) {
+  this._context = context;
+
+  context.createNodes(this, {
+    src: 'BufferSource',
+    amp: 'Gain'
+  });
+
+  this.src.to(this.amp);
+  this.src.buffer = buffer;
+}
+
+DrumVoice.prototype.to = function (destination) {
+  return this.amp.to(destination);
+};
+
+DrumVoice.prototype.setParams = function (params) {
+  this.src.playbackRate.value = params.speed;
+};
+
+DrumVoice.prototype.noteOn = function (intensity, params) {
+  var now = this._context.now;
+  
+  this.amp.gain
+    .step(0.0, now)
+    .line(intensity, now + params.attack)
+    .line(0.0, now + params.attack + params.decay);
+
+  this.src.start(now);
+  this.src.stop(now + params.attack + params.decay);
+};
+
+
+
+
+// SampleVoice class.
+// function SampleVoice(context, buffer) {
+//   this.context = context;
+//   this.buffer = buffer;
+
+//   context.createNodes(this, {
+//     src: 'BufferSource',
+//     lpf: 'BiquadFilter',
+//     amp: 'Gain'
+//   });
+
+//   this.src.to(this.lpf).to(this.amp);
+//   this.src.buffer = buffer;
+// }
+
+// SampleVoice.prototype.to = function (destination) {
+//   return this.amp.to(destination);
+// };
+
+// SampleVoice.prototype.setFilter = function (cutoff, reso) {
+//   this.lpf.frequency.value = cutoff;
+//   this.lpf.Q.value = reso;
+// };
+
+// SampleVoice.prototype.noteOn = function (intensity, when) {
+//   this.amp.gain.value = intensity;
+//   this.src.start(when);
+//   this.src.stop(when + this.src.buffer.duration);
+// };
+
+
+
+// Application object.
+// var Sampler = {
+  
+//   context: new AudioContext(),
+  
+//   controls: null,
+
+//   buffers: null,
+
+//   audioFiles: [
+//     { name: 'kick', url: 'sounds/kd-001.mp3' }, 
+//     { name: 'snare', url: 'sounds/sd-001.mp3' }, 
+//     { name: 'hihat', url: 'sounds/hh-001.mp3' }
+//   ],
+  
+//   keymap: {
+//     '16': 'kick',     // shift
+//     '13': 'snare',    // enter
+//     '190': 'hihat',   // period  
+//     '191': 'hihat',   // period  
+//   },
+
+//   initialize: function (buffers) {
+    
+//     this.buffers = buffers;
+    
+//     // Start listening the keydown event.
+//     window.addEventListener('keydown', function (event) {
+//       if (!this.keymap.hasOwnProperty(event.keyCode))
+//         return;
+
+//       var buffer = this.buffers.get(this.keymap[event.keyCode]);
+//       var sampleVoice = new SampleVoice(this.context, buffer);
+//       sampleVoice.setFilter(this.controls.cutoff.getValue(), this.controls.reso.getValue());
+//       sampleVoice.to(this.context.DAC);
+//       sampleVoice.noteOn(this.controls.amp.getValue(), this.context.now);
+//     }.bind(this));
+//   },
+
+//   loadResources: function () {
+//     this.context.loadAudioFiles(this.audioFiles, function() {}).then(
+//        this.initialize.bind(this), function () {});
+//   }
+
+// };
+
+
+// |createKnobs| From the 'Polyphony' tutorial.
+function createKnobs(domIds) {
+  var elements = {};
+  for (var i = 0; i < domIds.length; i++) {
+    var knobName = domIds[i].split('-')[1];
+    elements[knobName] = document.getElementById(domIds[i]);
+  }
+  return elements;
+}
+
+
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var Drummer = {
+
+    context: new AudioContext(),
+
+    buffers: null,
+
+    files: [
+      { name: 'kick', url: 'sounds/kd-001.mp3' }, 
+      { name: 'snare', url: 'sounds/sd-001.mp3' }, 
+      { name: 'hihat', url: 'sounds/hh-001.mp3' }
+    ],
+
+    knobs: createKnobs([
+      'k-speed', 'k-attack', 'k-decay', 'k-amp'
+    ]),
+
+    keymap: {
+      '16': 'kick',     // shift
+      '90': 'kick',     // 'z'
+      '222': 'snare',   // single-quote
+      '13': 'snare',    // enter
+      '190': 'hihat',   // period  
+      '191': 'hihat',   // period  
+    },
+
+    playSample: function (buffer) {
+      var voice = new DrumVoice(this.context, buffer);
+      voice.setParams({
+        speed: this.knobs.speed.getValue()
+      });
+      voice.to(this.context.DAC);
+      voice.noteOn(this.knobs.amp.getValue(), {
+        attack: this.knobs.attack.getValue(),
+        decay: this.knobs.decay.getValue()
+      });
+    },
+
+    startListen: function () {
+      window.addEventListener('keydown', function (event) {
+        if (!this.keymap.hasOwnProperty(event.keyCode))
+          return;
+
+        var buffer = this.buffers.get(this.keymap[event.keyCode]);
+        this.playSample(buffer);
+      }.bind(this));
+    },
+
+    onprogress: function (filename) {
+      console.log(filename + ' loaded.');
+    },
+
+    onresolve: function (buffers) {
+      this.buffers = buffers;
+      this.startListen();
+    },
+
+    onreject: function () {
+      console.log('Beware! Something went wrong!');
+    },
+
+    initialize: function () {
+      this.context.loadAudioFiles(this.files, this.onprogress.bind(this)).then(
+        this.onresolve.bind(this), this.onreject.bind(this));
+    }
+
+  };
+
+  Drummer.initialize();
+
+});
+</script>
+
+</body>
+
+</html>

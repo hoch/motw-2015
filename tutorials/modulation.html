@@ -19,22 +19,22 @@
   <div class="info">
     <h1>Subtractive Synth</h1>
     <h2>Modulation</h2>
-    <p class="description">Desgin </p>
+    <p class="description">Design <code>SawVoice</code> class with the LFO modulation and an AD envelope.</p>
     <ol>
-      <li>Design <code>Voice</code> class for the better control.</li>
-      <li>Implement AD envelope.</li>
-      <li>How to capture note on/off events nicely.</li>
+      <li>Press a key to trigger a voice: <code>[ a, w, s, e, d, f, t, g, y, h, j, k ]</code></li>
+      <li>Turn <code>LFO Rate</code> and <code>LFO Rate</code> knobs.</li>
+      <li>Turn <code>Attack</code> and <code>Decay</code> knobs.</li>
     </ol>
   </div>
 
   <div class="workspace">
+    <spiral-knob id="k-rate" label="LFO Rate" value="1" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-depth" label="LFO Depth" value="50" min-value="0" max-value="500"></spiral-knob>
+    <div class="param-divider"></div>
     <spiral-knob id="k-cutoff" label="Cutoff" value="250" min-value="60" max-value="1000"></spiral-knob>
     <spiral-knob id="k-reso" label="Reso" value="1.0" min-value="0.1" max-value="20"></spiral-knob>
     <spiral-knob id="k-attack" label="Attack" value="0.05" min-value="0.01" max-value="0.25"></spiral-knob>
     <spiral-knob id="k-decay" label="Decay" value="0.25" min-value="0.01" max-value="2.0"></spiral-knob>
-    <div class="param-divider"></div>
-    <spiral-knob id="k-rate" label="Vib Rate" value="1" min-value="0.1" max-value="20"></spiral-knob>
-    <spiral-knob id="k-depth" label="Vib Depth" value="50" min-value="0" max-value="500"></spiral-knob>
   </div>
 
   <div id="code-viewer">
@@ -102,7 +102,7 @@ SawVoice.prototype.noteOn = function (pitch, amp, attack, decay) {
  * TASK 2: Implement KeyboardHandler singleton object.
  */
 
-var keyboardHandler = {
+var KeyboardHandler = {
 
   _keymap: {
     '65': 60,   // C4
@@ -179,7 +179,7 @@ window.addEventListener('WebComponentsReady', function () {
   /**
    * TASK 3: Implement an event handler.
    */
-  keyboardHandler.notify = function (type, pitch) {
+  KeyboardHandler.notify = function (type, pitch) {
     switch (type) {
 
       /**
@@ -205,7 +205,7 @@ window.addEventListener('WebComponentsReady', function () {
     }
   };
 
-  keyboardHandler.startListen();
+  KeyboardHandler.startListen();
 
 });
 </script>
