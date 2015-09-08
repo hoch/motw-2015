@@ -1,0 +1,117 @@
+<!--
+  Tutorial: Subtractive Synthesizer - Monophony
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: Subtractive Synth | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+</head>
+
+<body>
+
+  <div class="info">
+    <h1>Subtractive Synth</h1>
+    <h2>Monophony</h2>
+    <p class="description">A simple subtractive monophonic synth with the filter control.</p>
+    <ul>
+      <li>Change <strong>Amp</strong> knob to hear something.</li>
+      <li>Press keys to change the pitch: <code>[ a, w, s, e, d, f, t, g, y, h, j, k ]</code></li>
+      <li>Change <strong>Cutoff</strong> and <strong>Reso</strong> knobs to change the tone.</li>
+    </ul>
+  </div>
+
+  <div class="workspace">
+    <spiral-knob id="k-cutoff" label="Cutoff" value="250" min-value="60" max-value="1000"></spiral-knob>
+    <spiral-knob id="k-reso" label="Reso" value="1.0" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-amp" label="Amp" value="0.0" min-value="0.0" max-value="1.0"></spiral-knob>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+
+<script id="tutorial-code">
+window.addEventListener('WebComponentsReady', function () {
+
+  /**
+   * TASK 1: Create a simple audiograph implements subtractive synthesis. 
+   *   Connect a sawtooth oscillator, a lowpass filter, an amplifier in series.
+   */
+
+  var context = new AudioContext();
+  var sawosc = context.createOscillator();
+  var lowpass = context.createBiquadFilter();
+  var amp = context.createGain();
+
+  sawosc.type = 'sawtooth';
+  lowpass.frequency.value = 1000;
+  amp.gain.value = 0.0;
+  
+  sawosc.to(lowpass).to(amp).to(context.DAC);
+  sawosc.start();
+
+
+  /**
+   * TASK 2: Design a simple key event handler. Capture the |keydown| event and
+   *   convert the key code to a MIDI pitch. Eventually we will convert it to
+   *   the frequency for the oscillator.
+   *
+   * Bonus point: Can you encapsulate the handler as a class so you can reuse
+   *   it in the next tutorial?
+   *
+   * Bonus point: How can you implement the |noteoff| action?
+   */
+
+  var keymap = {
+    '65': 60,   // a: C4
+    '87': 61,   // w: C#4
+    '83': 62,   // s: D4
+    '69': 63,   // e: D#4
+    '68': 64,   // d: E4
+    '70': 65,   // f: F4
+    '84': 66,   // t: F#4
+    '71': 67,   // g: G4
+    '89': 68,   // y: G#4
+    '72': 69,   // h: A4
+    '85': 70,   // u: A#4
+    '74': 71,   // j: B4
+    '75': 72    // k: C5
+  };
+
+  function handleKeyEvent(event) {
+    if (!keymap.hasOwnProperty(event.keyCode))
+      return;
+
+    sawosc.frequency.value = Spiral.mtof(keymap[event.keyCode]);
+  }
+
+  window.addEventListener('keydown', handleKeyEvent);
+
+
+  /**
+   * TASK 3: For your convenience, the example of Spiral elements is already
+   *   provided as shown below. However, can you achieve the same functionality
+   *   with <input> element?
+   */
+
+  var knobs = {
+    cutoff: document.getElementById('k-cutoff'),
+    reso: document.getElementById('k-reso'),
+    amp: document.getElementById('k-amp')
+  };
+  
+  knobs.cutoff.bind(lowpass.frequency);
+  knobs.reso.bind(lowpass.Q);
+  knobs.amp.bind(amp.gain);
+});
+</script>
+
+</body>
+
+</html>

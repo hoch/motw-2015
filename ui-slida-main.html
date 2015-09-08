@@ -1,0 +1,97 @@
+<!--
+  Tutorial 4-1: UI Slida!
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: UI | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+  <link rel="import" href="ui-slida.html">
+</head>
+
+<body>
+
+  <div class="info">
+    <h1>Your Own Slider</h1>
+    <h2>motw-slida</h2>
+    <p class="description">Create your own slider UI element for the parameter control.</p>
+    <ol>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <motw-slida id="slider1" label="Move Me" value="440" min-value="220" max-value="880" precision="0"></motw-slida>
+    <motw-slida id="slider2" label="Nudge Me" value="0.25" min-value="0.0" max-value="1.0"></motw-slida>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+
+<script id="tutorial-code">
+window.addEventListener('WebComponentsReady', function () {
+
+  var controller = {
+    context: new AudioContext(),
+
+    UI: {
+      slider1: document.getElementById('slider1'),
+      slider2: document.getElementById('slider2')
+    },
+    
+    initialize: function() {
+      this.context.createNodes(this, {
+        osc: 'Oscillator',
+        amp: 'Gain'
+      });
+
+      this.osc.to(this.amp).to(this.context.DAC);
+      this.osc.start();
+
+      this.UI.slider1.setController(controller);
+      this.UI.slider2.setController(controller);
+    },
+
+    onchange: function (which, value) {
+      switch (which) {
+        case 'Move Me':
+          this.osc.frequency.value = value;
+          break;
+        case 'Nudge Me':
+          this.amp.gain.value = value;
+          break;
+      }
+    },
+
+    onmidimessage: function (message) {
+      switch (message.type) {
+        case 'noteon':
+          this.UI.slider1.setValue(Spiral.mtof(message.data1));
+          break;
+        case 'controlchange':
+          this.UI.slider2.setValue(message.data2 / 127);
+          break;
+      }
+    }
+  };
+
+  Spiral.createMIDIManager().start().then(function (MIDI) {
+    controller.initialize();
+    MIDI.defineTarget('dummy', controller);
+    MIDI.connectAll().to('dummy');
+  });
+
+});
+</script>
+
+</body>
+
+</html>

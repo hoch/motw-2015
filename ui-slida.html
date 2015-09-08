@@ -1,0 +1,167 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<dom-module id="motw-slida">
+  <style>
+    :host {
+      position: relative;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+      margin: 5px 20px;
+    }
+
+    #label {
+      display: inline-block;
+      font-size: 0.75em;
+      width: 75px;
+      height: 16px;
+      line-height: 16px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    
+    #svg {
+      display: inline-block;
+      width: 128px;
+      height: 8px;
+      vertical-align: middle;
+      z-index: 10;
+    }
+
+    #background {
+      fill: #C5CAE9;
+      width: 128px;
+      height: 8px;
+    }
+
+    #gauge {
+      fill: #304FFE;
+      height: 16px;
+    }
+
+    #value {
+      display: inline-block;
+      background-color: #CFD8DC;
+      font-size: 0.75em;
+      font-weight: 700;
+      width: 50px;
+      height: 16px;
+      border-radius: 3px;
+      line-height: 16px; 
+      margin-left: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+  </style>
+
+  <template>
+    <div id="label">{{label}}</div>
+    <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" on-track="_onTrack">
+      <rect id="background" x="0" y="0" />
+      <rect id="gauge" x="0" y="0" />
+    </svg>
+    <div id="value">{{_valueString}}</div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'motw-slida',
+
+    properties: {
+      label: {
+        type: String,
+        value: 'unlabeled'
+      },
+      precision: {
+        type: Number,
+        value: 2
+      },
+      value: {
+        type: Number,
+        value: 64
+      },
+      minValue: {
+        type: Number,
+        value: 0
+      },
+      maxValue: {
+        type: Number,
+        value: 127
+      },
+      _width: {
+        type: Number,
+        value: 128  
+      },
+      _valueString: {
+        type: String,
+        value: 64
+      },
+      _controller: {
+        type: Object,
+        value: null
+      }
+    },
+
+    _updateView: function () {
+      this._valueString = this.value.toFixed(this.precision);
+      var guageWidth = (this.value - this.minValue) / (this.maxValue - this.minValue) * this._width;
+      this.$.gauge.setAttribute('width', guageWidth);
+    },
+
+    _onTrackStart: function (pos) {
+      document.body.style.cursor = 'move';
+    },
+
+    _onTrackMove: function (pos) {
+      var newValue = (pos.x / this._width) * (this.maxValue - this.minValue) + this.minValue;
+      this.setValue(newValue);
+    },
+
+    _onTrackEnd: function (pos) {
+      document.body.style.cursor = 'default';
+    },
+
+    _onTrack: function (event) {
+      // console.dir(event.detail.sourceEvent.target.nodeName)
+      if (event.detail.sourceEvent.target.nodeName !== 'rect')
+        return;
+      
+      var pos = event.detail;
+      pos.x = event.detail.sourceEvent.offsetX;
+      pos.y = event.detail.sourceEvent.offsetY;
+      
+      switch(pos.state) {
+        case 'start':
+          this._onTrackStart(pos);
+          break;
+        case 'track':
+          this._onTrackMove(pos);
+          break;
+        case 'end':
+          this._onTrackEnd(pos);
+          break;
+      }
+    },
+
+    setController: function (controller) {
+      this._controller = controller;
+      this._controller.onchange(this.label, this.value);
+    },
+
+    setValue: function (value) {
+      this.value = Math.min(Math.max(value, this.minValue), this.maxValue);
+      this._updateView();
+      if (this._controller)
+        this._controller.onchange(this.label, this.value);
+    },
+
+    created: function () {},
+    
+    ready: function () {},
+    
+    attached: function () {
+      this._updateView();
+    }
+
+  });
+</script>

@@ -3,19 +3,19 @@
     "title": "Tutorial: Subtractive Synth",
     "submenu": [
       {
-        "title": "Step 1",
-        "url": "subtractive-step1.html",
-        "hash": "tutorials-subtractive-step1"
+        "title": "Monophony",
+        "url": "monophony.html",
+        "hash": "tutorial-monophony"
       },
       {
-        "title": "Step 2",
-        "url": "subtractive-step2.html",
-        "hash": "tutorials-subtractive-step2"
+        "title": "Modulation",
+        "url": "modulation.html",
+        "hash": "tutorial-modulation"
       },
       {
-        "title": "Step 3",
-        "url": "subtractive-step3.html",
-        "hash": "tutorials-subtractive-step3"
+        "title": "Polyphony",
+        "url": "polyphony.html",
+        "hash": "tutorial-polyphony"
       }
     ]
   },
@@ -23,19 +23,19 @@
     "title": "Tutorial: Sampler",
     "submenu": [
       {
-        "title": "Step 1",
-        "url": "sampler-step1.html",
-        "hash": "tutorials-sampler-step1"
+        "title": "Type Writer",
+        "url": "typewriter.html",
+        "hash": "typewriter"
       },
       {
-        "title": "Step 2",
-        "url": "sampler-step2.html",
-        "hash": "tutorials-sampler-step2"
+        "title": "Drummin'",
+        "url": "drummin.html",
+        "hash": "drummin"
       },
       {
-        "title": "Step 3",
-        "url": "sampler-step3.html",
-        "hash": "tutorials-sampler-step3"
+        "title": "Grraaiinnzz",
+        "url": "grainz.html",
+        "hash": "grainz"
       }
     ]
   },
@@ -48,14 +48,19 @@
         "hash": "midi-inspector"
       },
       {
-        "title": "Step 2",
-        "url": "sampler-step2.html",
-        "hash": "tutorials-sampler-step2"
-      },
+        "title": "Drumpad",
+        "url": "midi-drumpad.html",
+        "hash": "midi-drumpad"
+      }
+    ]
+  },
+  {
+    "title": "Tutorial: UI",
+    "submenu": [
       {
-        "title": "Step 3",
-        "url": "sampler-step3.html",
-        "hash": "tutorials-sampler-step3"
+        "title": "Slida!",
+        "url": "ui-slida-main.html",
+        "hash": "ui-slida-main"
       }
     ]
   },

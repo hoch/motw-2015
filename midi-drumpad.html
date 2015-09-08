@@ -1,0 +1,256 @@
+<!--
+  Tutorial 3-2: MIDI Drum Pad
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Tutorial: MIDI | MOTW 2015</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="assets/motw-doc-header.html">
+  <style>
+    .label {
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+      line-height: 30px;
+      vertical-align: middle;
+    }
+
+    .value-display {
+      display: inline-block;
+      margin: 5px 30px 5px 5px;
+      padding: 0 5px;
+      background-color: #eee;
+      width: 150px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 5px;
+      vertical-align: middle;
+    }
+
+    input {
+      padding: 0 5px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 50px;
+      margin-right: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="info">
+    <h1>MIDI</h1>
+    <h2>Drum pads</h2>
+    <p class="description">Description here.</p>
+    <ol>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </ol>
+  </div>
+
+  <div class="workspace">
+    <div>
+      <span class="label">Sample</span>
+      <span id="sample-1" class="value-display"></span>
+      <span class="label">Pitch</span>
+      <input id="pitch-1"></input>
+    </div>
+    <div>
+      <span class="label">Sample</span>
+      <span id="sample-2" class="value-display"></span>
+      <span class="label">Pitch</span>
+      <input id="pitch-2"></input>
+    </div>
+    <div>
+      <span class="label">Sample</span>
+      <span id="sample-3" class="value-display"></span>
+      <span class="label">Pitch</span>
+      <input id="pitch-3"></input>
+    </div>
+    <div>
+      <span class="label">Input</span>
+      <span id="log" class="value-display"></span>
+    </div>
+  </div>
+
+  <div id="code-viewer">
+  </div>
+
+<script id="tutorial-code">
+
+
+function SampleVoice(context, buffer) {
+  context.createNodes(this, {
+    src: 'BufferSource',
+    amp: 'Gain'
+  });
+
+  this.src.to(this.amp);
+  this.src.buffer = buffer;
+}
+
+SampleVoice.prototype.to = function (destination) {
+  return this.amp.to(destination);
+};
+
+SampleVoice.prototype.noteOn = function (intensity, when) {
+  this.amp.gain.value = intensity;
+  this.src.start(when);
+  this.src.stop(when + this.src.buffer.duration);
+};
+
+
+function Sampler(context) {
+  this.context = context;
+
+  this.isReady = false;
+  this.buffers = null;
+
+  this.audioFiles = [
+    { name: 'snare', url:'sounds/sd-001.mp3' },
+    { name: 'kick', url:'sounds/kd-001.mp3' },
+    { name: 'hihat', url:'sounds/hh-001.mp3' }
+  ];
+
+  this.midiMap = new Map([
+    [48, 'kick'],
+    [58, 'snare'],
+    [54, 'hihat']
+  ]);
+
+  context.createNodes(this, {
+    output: 'Gain'
+  });
+
+  this.initialize();
+}
+
+Sampler.prototype.initialize = function () {
+  this.context.loadAudioFiles(this.audioFiles, function () {}).then(
+    function (buffers) {
+      this.buffers = buffers;
+      this.isReady = true;
+      if (this.onload)
+        this.onload();
+    }.bind(this),
+    function () {}
+  );
+};
+
+Sampler.prototype.to = function (destination) {
+  return this.output.to(destination);
+};
+
+Sampler.prototype.playSample = function (midiPitch, velocity) {
+  if (!this.isReady || !this.midiMap.has(midiPitch))
+    return;
+
+  var bufferName = this.midiMap.get(midiPitch);
+  var voice = new SampleVoice(this.context, this.buffers.get(bufferName));
+  voice.to(this.output);
+  voice.noteOn(velocity/127.0, this.context.now);
+};
+
+Sampler.prototype.onmidimessage  = function (message) {
+  if (message.type === 'noteon')
+    this.playSample(message.data1, message.data2);
+};
+
+Sampler.prototype.getMIDIMap = function () {
+  return this.midiMap;
+};
+
+Sampler.prototype.setMIDIMap = function (midiPitch, bufferName) {
+  var pitchToDelete = null;
+  
+  this.midiMap.forEach(function (name, pitch) {
+    if (bufferName === name)
+      pitchToDelete = pitch;
+  });
+
+  if (pitchToDelete) {
+    this.midiMap.delete(pitchToDelete);
+    this.midiMap.set(midiPitch, bufferName);
+  }
+};
+
+
+// Entry point.
+window.addEventListener('WebComponentsReady', function () {
+
+  var pitches = [
+    document.getElementById('pitch-1'),
+    document.getElementById('pitch-2'),
+    document.getElementById('pitch-3')
+  ];
+
+  var samples = [
+    document.getElementById('sample-1'),
+    document.getElementById('sample-2'),
+    document.getElementById('sample-3')
+  ];
+
+  var context = new AudioContext();
+  var sampler = new Sampler(context);
+  sampler.to(context.DAC);
+
+  var midiMap = sampler.getMIDIMap();
+
+  function updateView() {
+    var iteration = 0;
+    midiMap.forEach(function (bufferName, pitch) {
+      pitches[iteration].value = pitch;
+      samples[iteration].textContent = bufferName;
+      iteration++;
+    });
+  }
+
+  function handleInputChange(event) {
+    if (event.keyCode === 13) {
+      var bufferName = samples[pitches.indexOf(event.target)].textContent;
+      var newPitch = Number(event.target.value);
+      
+      if (newPitch < 0 || newPitch > 127)
+        return;
+      
+      sampler.setMIDIMap(newPitch, bufferName);
+      updateView();
+    }
+  }
+
+  var MIDILogger = {
+    logSpan: document.getElementById('log'),
+    onmidimessage: function (message) {
+      this.logSpan.textContent = message.data1;
+    }
+  };
+
+  Spiral.createMIDIManager().start().then(function (MIDI) {
+    MIDI.defineTarget('sampler', sampler);
+    MIDI.defineTarget('logger', MIDILogger);
+    MIDI.connectAll().to('sampler', 'logger');
+  });
+
+
+  // Assign event handlers.
+  sampler.onload = updateView;
+
+  for (var i = 0; i < pitches.length; i++)
+    pitches[i].onkeydown = handleInputChange;
+
+});
+</script>
+
+</body>
+
+</html>

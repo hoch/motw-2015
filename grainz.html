@@ -1,5 +1,5 @@
 <!--
-  Tutorial 1: Sampler, Step 3
+  Tutorial 1: Sampler - Grraaiinnzz
 -->
 
 <!doctype html>
@@ -18,7 +18,7 @@
   
   <div class="info">
     <h1>Sampler</h1>
-    <h2>Step 3</h2>
+    <h2>Grraaiinnzz</h2>
     <p class="description">A simple PCM sampler with few controls.</p>
     <ol>
       <li>Create <code>SampleVoice</code> class for the individual sample playback.</li>
@@ -35,6 +35,79 @@
   </div>
   
 <script id="tutorial-code">
+
+
+function GranularVoice(context, buffer) {
+  this._context = context;
+  this._buffer = buffer;
+
+  this.output = this._context.createGain();
+
+  this.params = {
+    speed: 1.0,
+    start: 0.0,
+    end: 1.0,
+    density: 0.5,
+    length: 0.2,
+    variation: 0.1
+  };
+
+  this._isPlaying = false;
+}
+
+GranularVoice.prototype._generateGrain = function () {
+  console.log(this);
+  if (Math.random() < this.params.density) {
+    var src = this._context.createBufferSource();
+    src.buffer = this._buffer;
+    src.playbackRate.value = this.params.speed;
+    var startTime = Spiral.random2f(this.params.start, this.params.end) * this._buffer.duration;
+    var variation = ((Math.random() < 0.5 ) ? -1 : 1 ) * this.params.variation * Math.random();
+
+    src.to(this.output);
+    src.start(this._context.now, startTime, this.params.length + variation);
+  }
+
+  if (this._isPlaying)
+    requestAnimationFrame(this._generateGrain.bind(this));
+};
+
+GranularVoice.prototype.to = function (destination) {
+  this.output.to(destination);
+  return null;
+};
+
+GranularVoice.prototype.setParam = function (paramName, value) {
+  if (!this.params.hasOwnProperty(paramName))
+    return;
+
+  this.params[paramName] = value;
+};
+
+GranularVoice.prototype.getParams = function () {
+  return this.params;
+};
+
+GranularVoice.prototype.noteOn = function () {
+  console.log('noteon')
+  this._isPlaying = true;
+  this._generateGrain();
+};
+
+GranularVoice.prototype.noteOff = function () {
+  console.log('noteoff')
+  this._isPlaying = false;
+};
+
+
+
+
+// tune
+// keyhandler => pitch => tune
+// noteon => start generating, noteoff => stop it
+// knob start, end => between duration
+// density, grain duration + variation
+
 
 
 function SampleVoice(context, buffer) {
@@ -134,19 +207,39 @@ Sampler.prototype.postMessage = function (which, eventType, data) {
 window.addEventListener('WebComponentsReady', function () {
 
   var context = new AudioContext();
-  var sampler = new Sampler(context);
 
-  sampler.to(context.DAC);
+  var GVoice;
 
-  var knobs = {
-    mix: document.getElementById('k-mix')
-  };
+  var files = [
+    { name: 'snare', url:'sounds/sd-001.mp3' }
+  ];
 
-  knobs.mix.setController(sampler);
-  sampler.setMix(knobs.mix.getValue());
+  var none = function () {};
+
+  context.loadAudioFiles(files, none).then(function (buffers) {
+    GVoice = new GranularVoice(context, buffers.get('snare'));
+    GVoice.to(context.DAC);
+  });
+
+
+
+  // var sampler = new Sampler(context);
+
+  // sampler.to(context.DAC);
+
+  // var knobs = {
+  //   mix: document.getElementById('k-mix')
+  // };
+
+  // knobs.mix.setController(sampler);
+  // sampler.setMix(knobs.mix.getValue());
 
   window.addEventListener('keydown', function (event) {
-    sampler.playSample(event.keyCode);
+    if (event.keyCode === 13)
+      GVoice.noteOn();
+
+    if (event.keyCode === 16)
+      GVoice.noteOff();
   });
   
 });
