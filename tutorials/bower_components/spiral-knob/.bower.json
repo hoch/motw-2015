@@ -1,6 +1,6 @@
 {
   "name": "spiral-knob",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     "Hongchan Choi <hongchan.choi@gmail.com>"
   ],
@@ -30,13 +30,13 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.5",
     "web-component-tester": "*"
   },
-  "_release": "0.0.1",
+  "_release": "0.0.2",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.1",
-    "commit": "43f7ea9a786e79bfb1e268dd7547e01c608e1ef8"
+    "tag": "v0.0.2",
+    "commit": "2399862ad42b5cfde9a57d8d279e3b793a7dae43"
   },
   "_source": "git://github.com/hoch/spiral-knob.git",
-  "_target": "~0.0.1",
+  "_target": "^0.0.2",
   "_originalSource": "hoch/spiral-knob"
 }

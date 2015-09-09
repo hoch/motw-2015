@@ -30,6 +30,6 @@
     "commit": "4891d15995920bc1ea9cf8748ed9821be979a93b"
   },
   "_source": "git://github.com/hoch/spiral.git",
-  "_target": "~0.0.2",
+  "_target": "^0.0.2",
   "_originalSource": "hoch/spiral"
 }
