@@ -8,8 +8,6 @@
 <head>
   <title>Tutorial: Sampler | MOTW 2015</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="assets/motw-doc-header.html">
 </head>
@@ -19,15 +17,21 @@
   <div class="info">
     <h1>Sampler</h1>
     <h2>Grraaiinnzz</h2>
-    <p class="description">A simple PCM sampler with few controls.</p>
+    <p class="description">A granular synthesizer with several controls.</p>
     <ol>
-      <li>Create <code>SampleVoice</code> class for the individual sample playback.</li>
-      <li>Use <code>keydown</code> event to trigger different samples with the associated key.</li>
-      <li>Create a <code>Sampler</code> singleton object for the application.</li>
+      <li>Use <code>Space Bar</code> to start and stop the granular synth.</li>
+      <li>While playing sound, tweak knobs to change the different aspects of sound.</li>
     </ol>
   </div>
 
   <div class="workspace">
+    <spiral-knob id="k-speed" label="Speed" value="1.0" min-value="0.01" max-value="2.0"></spiral-knob>
+    <spiral-knob id="k-start" label="Start" value="0.0" min-value="0.0" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-end" label="End" value="1.0" min-value="0.0" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-density" label="Density" value="0.5" min-value="0.0" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-length" label="Length" value="0.2" min-value="0.01" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-variation" label="Var" value="0.1" min-value="0.0" max-value="0.5"></spiral-knob>
+    <div class="param-divider"></div>
     <spiral-knob id="k-mix" label="Mix" value="0.75" min-value="0.0" max-value="1.0"></spiral-knob>
   </div>
 
@@ -36,12 +40,15 @@
   
 <script id="tutorial-code">
 
-
+/**
+ * TASK 1: Design |GranularVoice| class.
+ */
 function GranularVoice(context, buffer) {
   this._context = context;
-  this._buffer = buffer;
-
   this.output = this._context.createGain();
+
+  this._buffer = buffer;
+  this._isPlaying = false;
 
   this.params = {
     speed: 1.0,
@@ -49,23 +56,36 @@ function GranularVoice(context, buffer) {
     end: 1.0,
     density: 0.5,
     length: 0.2,
-    variation: 0.1
+    variationation: 0.1
   };
 
-  this._isPlaying = false;
+  this._knobs = null;
+  this._isWatching = false;
 }
 
 GranularVoice.prototype._generateGrain = function () {
-  console.log(this);
+  /**
+   * 1.1 Implement knob-wathcher mechanism with requestAnimationFrame().
+   *   - Check if _isWatching varible is true and update the internal parameters
+   *     if that is the case.
+   */
+  if (this._isWatching) {
+    for (var paramName in this._knobs) {
+      if (this.params.hasOwnProperty(paramName))
+        this.params[paramName] = this._knobs[paramName].getValue();
+    }
+  }
+
   if (Math.random() < this.params.density) {
     var src = this._context.createBufferSource();
     src.buffer = this._buffer;
     src.playbackRate.value = this.params.speed;
     var startTime = Spiral.random2f(this.params.start, this.params.end) * this._buffer.duration;
-    var variation = ((Math.random() < 0.5 ) ? -1 : 1 ) * this.params.variation * Math.random();
+    var variationation = ((Math.random() < 0.5 ) ? -1 : 1 ) * this.params.variationation * Math.random();
 
     src.to(this.output);
-    src.start(this._context.now, startTime, this.params.length + variation);
+    var dur = this.params.length + variationation;
+    src.start(this._context.now, startTime, (dur < 0.003) ? 0.003 : dur);
   }
 
   if (this._isPlaying)
@@ -77,170 +97,140 @@ GranularVoice.prototype.to = function (destination) {
   return null;
 };
 
-GranularVoice.prototype.setParam = function (paramName, value) {
-  if (!this.params.hasOwnProperty(paramName))
+GranularVoice.prototype.watch = function (knobs) {
+  if (!knobs) {
+    this._knobs = null;
+    this._isWatching = false;  
     return;
+  }
 
-  this.params[paramName] = value;
-};
-
-GranularVoice.prototype.getParams = function () {
-  return this.params;
+  this._knobs = knobs;
+  this._isWatching = true;
 };
 
 GranularVoice.prototype.noteOn = function () {
-  console.log('noteon')
   this._isPlaying = true;
   this._generateGrain();
 };
 
 GranularVoice.prototype.noteOff = function () {
-  console.log('noteoff')
   this._isPlaying = false;
 };
 
 
-
-
-// tune
-// keyhandler => pitch => tune
-// noteon => start generating, noteoff => stop it
-// knob start, end => between duration
-// density, grain duration + variation
-
-
-
-function SampleVoice(context, buffer) {
-  context.createNodes(this, {
-    src: 'BufferSource',
-    amp: 'Gain'
-  });
-
-  this.src.to(this.amp);
-  this.src.buffer = buffer;
+// From the 'Polyphony' tutorial, to create multiple DOM elements handles.
+function createKnobs(domIds) {
+  var elements = {};
+  for (var i = 0; i < domIds.length; i++) {
+    var knobName = domIds[i].split('-')[1];
+    elements[knobName] = document.getElementById(domIds[i]);
+  }
+  return elements;
 }
-
-SampleVoice.prototype.to = function (destination) {
-  return this.amp.to(destination);
-};
-
-SampleVoice.prototype.noteOn = function (intensity, when) {
-  this.amp.gain.value = intensity;
-  this.src.start(when);
-  this.src.stop(when + this.src.buffer.duration);
-};
-
-
-
-function Sampler(context) {
-  this.context = context;
-
-  this.isReady = false;
-  this.buffers = null;
-  
-  this.audioFiles = [
-    { name: 'snare', url:'sounds/sd-001.mp3' },
-    { name: 'kick', url:'sounds/kd-001.mp3' },
-    { name: 'hihat', url:'sounds/hh-001.mp3' },
-    { name: 'reverbIR', url:'sounds/960-BriteStage.mp3' }
-  ];
-
-  this.keymap = {
-    '16': 'kick',     // shift
-    '13': 'snare',    // enter
-    '190': 'hihat',   // period  
-    '191': 'hihat',   // period  
-  };
-
-  context.createNodes(this, {
-    efx: 'Gain',
-    wet: 'Gain',
-    dry: 'Gain',
-    reverb: 'Convolver',
-    output: 'Gain'
-  });
-
-  this.efx.to(this.wet, this.dry);
-  this.dry.to(this.output);
-  this.wet.to(this.reverb).to(this.output);
-
-  this.initialize();
-}
-
-Sampler.prototype.initialize = function () {
-  this.context.loadAudioFiles(this.audioFiles, function () {}).then(
-    function (buffers) {
-      this.buffers = buffers;
-      this.reverb.buffer = this.buffers.get('reverbIR');
-      this.isReady = true;
-    }.bind(this),
-    function () {}
-  ); 
-};
-
-Sampler.prototype.to = function (destination) {
-  return this.output.to(destination);
-};
-
-Sampler.prototype.playSample = function (keyCode) {
-  if (!this.isReady || !this.keymap.hasOwnProperty(keyCode))
-    return;
-
-  var bufferName = this.keymap[keyCode];
-  var voice = new SampleVoice(this.context, this.buffers.get(bufferName));
-  voice.to(this.efx);
-  voice.noteOn(0.75, this.context.now);
-};
-
-Sampler.prototype.setMix = function (mix) {
-  this.wet.gain.value = mix;
-  this.dry.gain.value = 1.0 - mix;
-};
-
-Sampler.prototype.postMessage = function (which, eventType, data) {
-  if (eventType === 'touched')
-    this.setMix(data.value);
-};
 
 
 // Entry point.
 window.addEventListener('WebComponentsReady', function () {
 
-  var context = new AudioContext();
+  /**
+   * TASK 2: Design |Granularizer| object as a top-level synthesizer controller.
+   */
+  var Granularizer = {
 
-  var GVoice;
+    context: new AudioContext(),
 
-  var files = [
-    { name: 'snare', url:'sounds/sd-001.mp3' }
-  ];
+    buffers: null,
 
-  var none = function () {};
+    files: [
+      { name: 'voice', url: 'sounds/motw-announce.mp3' },
+      { name: 'reverbIR', url: 'sounds/960-BigEmptyChurch.mp3' }
+    ],
 
-  context.loadAudioFiles(files, none).then(function (buffers) {
-    GVoice = new GranularVoice(context, buffers.get('snare'));
-    GVoice.to(context.DAC);
-  });
+    knobs: createKnobs([
+      'k-speed', 'k-start', 'k-end', 'k-density', 'k-length', 'k-variation', 'k-mix'
+    ]),
 
+    setMix: function (mix) {
+      this.wet.gain.value = mix;
+      this.dry.gain.value = 1.0 - mix;
+    },
 
+    postMessage: function (which, eventType, data) {
+      if (eventType === 'touched')
+        this.setMix(data.value);
+    },
 
-  // var sampler = new Sampler(context);
+    startListen: function () {
+      var isPressed = false;
+      var currentVoice = null;
+      
+      /**
+       * 2.1 Handle |keydown| and |keyup| event for the monophonic behavior
+       *   accordingly.
+       *   - keydown: trigger a new GranularVoice and start to watch knobs.
+       *   - keyup: unwatch the knobs dispose the voice.
+       */
+      window.addEventListener('keydown', function (event) {
+        if (isPressed || event.keyCode !== 32)
+          return;
 
-  // sampler.to(context.DAC);
+        isPressed = true;
+        currentVoice = new GranularVoice(this.context, this.buffers.get('voice'));
+        currentVoice.watch(this.knobs);
+        currentVoice.to(this.efx);
+        currentVoice.noteOn();
+      }.bind(this));
 
-  // var knobs = {
-  //   mix: document.getElementById('k-mix')
-  // };
+      window.addEventListener('keyup', function (event) {
+        if (!isPressed || event.keyCode !== 32)
+          return;
+        
+        isPressed = false;
+        currentVoice.watch(null);
+        currentVoice.noteOff();
+      }.bind(this));
+    },
 
-  // knobs.mix.setController(sampler);
-  // sampler.setMix(knobs.mix.getValue());
+    onprogress: function (filename) {
+      console.log(filename + ' loaded.');
+    },
 
-  window.addEventListener('keydown', function (event) {
-    if (event.keyCode === 13)
-      GVoice.noteOn();
+    onresolve: function (buffers) {
+      this.buffers = buffers;
+      this.reverb.buffer = this.buffers.get('reverbIR');
+      this.startListen();
+    },
 
-    if (event.keyCode === 16)
-      GVoice.noteOff();
-  });
+    onreject: function () {
+      console.log('Beware! Something went wrong!');
+    },
+
+    initialize: function () {
+      /**
+       * 2.2 Implement Convolution reverb as a master effect. Add 'mix' control
+       *   and bind it to the knob UI element.
+       */
+      this.context.createNodes(this, {
+        efx: 'Gain',
+        wet: 'Gain',
+        dry: 'Gain',
+        reverb: 'Convolver',
+        output: 'Gain'
+      });
+
+      this.efx.to(this.wet, this.dry);
+      this.dry.to(this.output);
+      this.wet.to(this.reverb).to(this.output).to(this.context.DAC);
+
+      this.knobs.mix.setController(this);
+
+      this.context.loadAudioFiles(this.files, this.onprogress.bind(this)).then(
+        this.onresolve.bind(this), this.onreject.bind(this));
+    }
+
+  };
+
+  Granularizer.initialize();
   
 });
 </script>

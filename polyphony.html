@@ -8,8 +8,6 @@
 <head>
   <title>Tutorial: Subtractive Synth | MOTW 2015</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="assets/motw-doc-header.html">
 </head>
@@ -311,7 +309,7 @@ window.addEventListener('WebComponentsReady', function () {
           fltR: knobs.fltR.getValue(),
           ampR: knobs.ampR.getValue()
         });
-        
+
         voices[pitch] = null;
         break;
       }

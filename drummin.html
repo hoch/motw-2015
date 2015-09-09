@@ -8,8 +8,6 @@
 <head>
   <title>Tutorial: Sampler | MOTW 2015</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="assets/motw-doc-header.html">
 </head>
@@ -21,7 +19,8 @@
     <h2>Drummin'</h2>
     <p class="description">A simple PCM Drum sampler with few controls.</p>
     <ol>
-      <li></li>
+      <li>Use <code>{ Shift, 'z', Enter, Single-quote, '/' }</code> keys to play drum sounds.</li>
+      <li>Tweak <strong>playback speed</strong>, <strong>attack</strong> and <strong>decay</strong> to create different drum sound.</li>
     </ol>
   </div>
 
@@ -43,6 +42,10 @@
  *   - Use the same design as SawVoice in the previous tutorial.
  */
 function DrumVoice(context, buffer) {
+  /**
+   * 1.1 Design the contstuctor of DrumVoice object.
+   *   - Include one buffersource node and a gain node.
+   */
   this._context = context;
 
   context.createNodes(this, {
@@ -63,6 +66,11 @@ DrumVoice.prototype.setParams = function (params) {
 };
 
 DrumVoice.prototype.noteOn = function (intensity, params) {
+  /**
+   * 1.2 Implement noteOn() method.
+   *   - Start and stop the buffer source node correctly.
+   *   - Apply the attack/decay envelope.
+   */
   var now = this._context.now;
   
   this.amp.gain
@@ -75,88 +83,7 @@ DrumVoice.prototype.noteOn = function (intensity, params) {
 };
 
 
-
-
-// SampleVoice class.
-// function SampleVoice(context, buffer) {
-//   this.context = context;
-//   this.buffer = buffer;
-
-//   context.createNodes(this, {
-//     src: 'BufferSource',
-//     lpf: 'BiquadFilter',
-//     amp: 'Gain'
-//   });
-
-//   this.src.to(this.lpf).to(this.amp);
-//   this.src.buffer = buffer;
-// }
-
-// SampleVoice.prototype.to = function (destination) {
-//   return this.amp.to(destination);
-// };
-
-// SampleVoice.prototype.setFilter = function (cutoff, reso) {
-//   this.lpf.frequency.value = cutoff;
-//   this.lpf.Q.value = reso;
-// };
-
-// SampleVoice.prototype.noteOn = function (intensity, when) {
-//   this.amp.gain.value = intensity;
-//   this.src.start(when);
-//   this.src.stop(when + this.src.buffer.duration);
-// };
-
-
-
-// Application object.
-// var Sampler = {
-  
-//   context: new AudioContext(),
-  
-//   controls: null,
-
-//   buffers: null,
-
-//   audioFiles: [
-//     { name: 'kick', url: 'sounds/kd-001.mp3' }, 
-//     { name: 'snare', url: 'sounds/sd-001.mp3' }, 
-//     { name: 'hihat', url: 'sounds/hh-001.mp3' }
-//   ],
-  
-//   keymap: {
-//     '16': 'kick',     // shift
-//     '13': 'snare',    // enter
-//     '190': 'hihat',   // period  
-//     '191': 'hihat',   // period  
-//   },
-
-//   initialize: function (buffers) {
-    
-//     this.buffers = buffers;
-    
-//     // Start listening the keydown event.
-//     window.addEventListener('keydown', function (event) {
-//       if (!this.keymap.hasOwnProperty(event.keyCode))
-//         return;
-
-//       var buffer = this.buffers.get(this.keymap[event.keyCode]);
-//       var sampleVoice = new SampleVoice(this.context, buffer);
-//       sampleVoice.setFilter(this.controls.cutoff.getValue(), this.controls.reso.getValue());
-//       sampleVoice.to(this.context.DAC);
-//       sampleVoice.noteOn(this.controls.amp.getValue(), this.context.now);
-//     }.bind(this));
-//   },
-
-//   loadResources: function () {
-//     this.context.loadAudioFiles(this.audioFiles, function() {}).then(
-//        this.initialize.bind(this), function () {});
-//   }
-
-// };
-
-
-// |createKnobs| From the 'Polyphony' tutorial.
+// From the 'Polyphony' tutorial, to create multiple DOM elements handles.
 function createKnobs(domIds) {
   var elements = {};
   for (var i = 0; i < domIds.length; i++) {
@@ -170,6 +97,9 @@ function createKnobs(domIds) {
 // Entry point.
 window.addEventListener('WebComponentsReady', function () {
 
+  /**
+   * TASK 2: Design Drummer singleton object.
+   */
   var Drummer = {
 
     context: new AudioContext(),
@@ -195,6 +125,13 @@ window.addEventListener('WebComponentsReady', function () {
       '191': 'hihat',   // period  
     },
 
+    /**
+     * 2.1 Implement playSample() method.
+     *   - Assign the buffer to a newly created DrumVoice object.
+     *   - Set any relevant parameters.
+     *   - Connect the DrumVoice object to DAC.
+     *   - Trigger the note.
+     */
     playSample: function (buffer) {
       var voice = new DrumVoice(this.context, buffer);
       voice.setParams({

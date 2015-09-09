@@ -21,7 +21,7 @@
     "paper-styles": "PolymerElements/paper-styles#^1.0.11",
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.1.0",
     "polymer": "Polymer/polymer#^1.1.1",
-    "spiral": "hoch/spiral#~0.0.2",
-    "spiral-knob": "hoch/spiral-knob#~0.0.1"
+    "spiral": "hoch/spiral#^0.0.2",
+    "spiral-knob": "hoch/spiral-knob#^0.0.2"
   }
 }
