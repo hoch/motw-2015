@@ -19,9 +19,8 @@
     <h2>Grraaiinnzz</h2>
     <p class="description">A granular synthesizer with several controls.</p>
     <ol>
-      <li>Create <code>SampleVoice</code> class for the individual sample playback.</li>
-      <li>Use <code>keydown</code> event to trigger different samples with the associated key.</li>
-      <li>Create a <code>Sampler</code> singleton object for the application.</li>
+      <li>Use <code>Space Bar</code> to start and stop the granular synth.</li>
+      <li>While playing sound, tweak knobs to change the different aspects of sound.</li>
     </ol>
   </div>
 
@@ -41,12 +40,15 @@
   
 <script id="tutorial-code">
 
-
+/**
+ * TASK 1: Design |GranularVoice| class.
+ */
 function GranularVoice(context, buffer) {
   this._context = context;
-  this._buffer = buffer;
-
   this.output = this._context.createGain();
+
+  this._buffer = buffer;
+  this._isPlaying = false;
 
   this.params = {
     speed: 1.0,
@@ -58,12 +60,15 @@ function GranularVoice(context, buffer) {
   };
 
   this._knobs = null;
-
-  this._isPlaying = false;
   this._isWatching = false;
 }
 
 GranularVoice.prototype._generateGrain = function () {
+  /**
+   * 1.1 Implement knob-wathcher mechanism with requestAnimationFrame().
+   *   - Check if _isWatching varible is true and update the internal parameters
+   *     if that is the case.
+   */
   if (this._isWatching) {
     for (var paramName in this._knobs) {
       if (this.params.hasOwnProperty(paramName))
@@ -104,18 +109,13 @@ GranularVoice.prototype.watch = function (knobs) {
 };
 
 GranularVoice.prototype.noteOn = function () {
-  console.log('noteon')
   this._isPlaying = true;
   this._generateGrain();
 };
 
 GranularVoice.prototype.noteOff = function () {
-  console.log('noteoff')
   this._isPlaying = false;
 };
-
-
-
 
 
 // From the 'Polyphony' tutorial, to create multiple DOM elements handles.
@@ -132,6 +132,9 @@ function createKnobs(domIds) {
 // Entry point.
 window.addEventListener('WebComponentsReady', function () {
 
+  /**
+   * TASK 2: Design |Granularizer| object as a top-level synthesizer controller.
+   */
   var Granularizer = {
 
     context: new AudioContext(),
@@ -161,6 +164,12 @@ window.addEventListener('WebComponentsReady', function () {
       var isPressed = false;
       var currentVoice = null;
       
+      /**
+       * 2.1 Handle |keydown| and |keyup| event for the monophonic behavior
+       *   accordingly.
+       *   - keydown: trigger a new GranularVoice and start to watch knobs.
+       *   - keyup: unwatch the knobs dispose the voice.
+       */
       window.addEventListener('keydown', function (event) {
         if (isPressed || event.keyCode !== 32)
           return;
@@ -197,6 +206,10 @@ window.addEventListener('WebComponentsReady', function () {
     },
 
     initialize: function () {
+      /**
+       * 2.2 Implement Convolution reverb as a master effect. Add 'mix' control
+       *   and bind it to the knob UI element.
+       */
       this.context.createNodes(this, {
         efx: 'Gain',
         wet: 'Gain',
