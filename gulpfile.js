@@ -16,7 +16,7 @@ gulp.task('clean', del.bind(null, [
   '!app'
 ]));
 
-gulp.task('tuts', function () {
+gulp.task('tutorials', function () {
   browserSync.init({
     notify: false,
     server: {
@@ -48,7 +48,7 @@ gulp.task('app', function () {
   ], browserSync.reload);
 });
 
-gulp.task('deploy-tuts', function () {
+gulp.task('deploy-tutorials', function () {
   return gulp.src('tutorials/**/*')
     .pipe(deploy());
 });

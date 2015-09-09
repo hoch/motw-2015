@@ -168,8 +168,12 @@
 
       _parseUrlAndLoad: function () {
         var regex = /\#(.*)/;
-        var hash = regex.exec(window.location.href)[1];
-        var pageRef = this._findPageReferenceByHash(hash);
+        var hashes = regex.exec(window.location.href);
+        
+        if (!hashes || hashes.length < 1)
+          return;
+
+        var pageRef = this._findPageReferenceByHash(hashes[1]);
         this._setCurrentPage(pageRef);
       },
 
