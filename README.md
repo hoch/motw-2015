@@ -5,8 +5,8 @@ This repository is the boilerplate project for "Musicking on the Web" workshop. 
 ## Prerequisites
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/)
-- [Bower](http://bower.io/#install-bower)
-- [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
+- [Bower](http://bower.io/#install-bower) (requires Node.js)
+- [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) (requires Node.js)
 
 Note that the installation of these prerequisites may require the system admin privileges.
 
@@ -30,7 +30,7 @@ Make sure you are in __the project root directory__ before running the following
 - Take a look around the workshop tutorials on the local tutorial server. Stop the server when you're ready to write your own code.
 ~~~bash
 # start tutorial server
-gulp tuts
+gulp tutorials
 ~~~
 
 - Then start up the development server and do your work. Any change in the `app` directory will trigger _the refresh in the browser automatically._
