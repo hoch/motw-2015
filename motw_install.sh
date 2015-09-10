@@ -20,7 +20,9 @@ printf "  + installing Bower components...\n"
 pushd tutorials >> ../motw_install.log
 bower install >> ../motw_install.log
 popd >> ../motw_install.log
-
+pushd app >> ../motw_install.log
+bower install >> ../motw_install.log
+popd >> ../motw_install.log
 
 
 # Finish
