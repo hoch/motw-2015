@@ -11,9 +11,7 @@ var gulp        = require('gulp'),
 var deploy      = require('gulp-gh-pages');
 
 gulp.task('clean', del.bind(null, [
-  '.publish',
-  'app/**/*',
-  '!app'
+  '.publish'
 ]));
 
 gulp.task('tutorials', function () {

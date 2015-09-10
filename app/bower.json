@@ -1,7 +1,7 @@
 {
   "name": "my-first-music-app",
   "version": "0.0.1",
-  "homepage": "https://my.home.come",
+  "homepage": "https://my.home.com",
   "authors": [
     "johndoe@gmail.com"
   ],
@@ -11,7 +11,9 @@
     "bower_components"
   ],
   "dependencies": {
+    "paper-styles": "PolymerElements/paper-styles#~1.0.11",
     "polymer": "Polymer/polymer#^1.1.1",
-    "spiral": "hoch/spiral#~0.0.2"
+    "spiral": "hoch/spiral#~0.0.2",
+    "spiral-knob": "hoch/spiral-knob#~0.0.2"
   }
 }

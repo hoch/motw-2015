@@ -1,0 +1,374 @@
+<!--
+@license
+MIT License. Copyright (c) 2015 Hongchan Choi. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+
+<!--
+Renders a knob (circular UI widget for parameter control) which can be bound 
+to AudioParam object.
+
+Example:
+
+    <spiral-knob id="knob-freq" label="Freq" size="large" track="true" 
+      value="100" min-value="60" max-value="250"></spiral-knob>
+
+@demo
+-->
+<dom-module id="spiral-knob">
+
+  <style>
+    :host {
+      position: relative;
+      display: inline-block;
+      box-sizing: border-box;
+      overflow: hidden;
+      margin: 4px;
+      -webkit-user-select: none;
+    }
+
+    input {
+      outline: none;
+      -webkit-user-select: none;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.75em;
+      height: 16px;
+      line-height: 16px;
+      text-align: center;
+    }
+
+    .container {
+      display: block;
+      cursor: move;
+    }
+
+    .outer-ring {
+      stroke: #78909C;
+      stroke-width: 0.75px;
+      fill: #F5F5F5;
+    }
+
+    .gauge {
+      stroke: #0091EA;
+      fill: none;
+    }
+
+    .inner-ring {
+      fill: #90A4AE;
+    }
+
+    .overlay {
+      fill: #e91e63;
+      opacity: 0;
+    }
+
+    .value {
+      display: block;
+      background-color: #ECEFF1;
+      margin: 0 auto;
+      font-size: 0.75em;
+      height: 16px;
+      line-height: 16px;
+      width: 90%;
+      text-align: center;
+      border-radius: 3px;
+      border: none;
+    }
+  </style>
+
+  <template>
+    <div class="label">{{label}}</div>
+    <svg id="svg" class="container" version="1.1" xmlns="http://www.w3.org/2000/svg" on-track="_onTrack">
+      <circle id="outerRing" class="outer-ring" />
+      <path id="knob" class="gauge" />
+      <circle id="innerRing" class="inner-ring" />
+      <rect id="overlay" class="overlay" x="0" y="0" />
+    </svg>
+    <input id="valueInput" type="text" class="value" value="{{_valueString}}" readonly>
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'spiral-knob',
+
+    properties: {
+
+      label: {
+        type: String,
+        value: 'unlabeled'
+      },
+
+      value: {
+        type: Number,
+        value: 0.0
+      },
+
+      minValue: {
+        type: Number,
+        value: 0.0
+      },
+
+      maxValue: {
+        type: Number,
+        value: 1.0
+      },
+
+      computedValue: {
+        type: Number,
+        value: 0.0
+      },
+
+      size: {
+        type: String,
+        value: 'normal'
+      },
+
+      track: {
+        type: Boolean,
+        value: false
+      },
+
+      _targetAudioParam: {
+        type: Object,
+        value: null
+      },
+
+      _valueString: String,
+
+      _normValue: {
+        type: Number,
+        value: 0.0
+      },
+
+      _offsetRadian: {
+        type: Number,
+        value: Math.PI * 0.75
+      },
+      
+      _arcPath: Object,
+      
+      _arcCenter: Number,
+      _arcRadius: Number,
+
+      _size: {
+        type: Number,
+        value: 48
+      },
+
+      _componentId: {
+        type: String,
+        value: 'spiral-knob'
+      }
+      
+    },
+
+
+    /** Helpers **/
+
+    _initialize: function () {
+      this._createGraphics();
+    },
+
+    _createGraphics: function () {
+
+      switch (this.size) {
+        case 'small':
+          this._size = 48;
+          break;
+        case 'large':
+          this._size = 96;
+          break;
+        default:
+          this._size = 64;
+          break;
+      }
+
+      // Set the dimension first.
+      this.style.width = this._size + 'px';
+      this.style.height = (34 + this._size) + 'px';
+      this.$.svg.style.width = this._size + 'px';
+      this.$.svg.style.height = this._size + 'px';
+
+      // NOTE: _size better be an even number...
+      var baseSize = this._size * 0.9;
+      this._arcCenter = this._size / 2;
+      this._arcRadius = baseSize * 0.41;
+
+      this.$.outerRing.setAttribute('cx', this._arcCenter);
+      this.$.outerRing.setAttribute('cy', this._arcCenter);
+      this.$.outerRing.setAttribute('r', baseSize * 0.5);
+      this.$.innerRing.setAttribute('cx', this._arcCenter);
+      this.$.innerRing.setAttribute('cy', this._arcCenter);
+      this.$.innerRing.setAttribute('r', baseSize * 0.325);
+
+      // The norm value needs to be updated for the first time.
+      this._normValue = (this.value - this.minValue) / (this.maxValue - this.minValue);
+      var target = this._normValue * Math.PI * 1.5;
+      var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offsetRadian);
+      var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offsetRadian);
+      var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offsetRadian);
+      var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offsetRadian);
+      var flag = (target < Math.PI) ? 0 : 1;
+      var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
+      d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
+
+      this.$.knob.setAttribute('d', d);
+      this.$.knob.setAttribute('stroke-width', baseSize * 0.12);
+      this._arcPath = this.$.knob.pathSegList.getItem(1);
+    },
+
+    // Track the current target audioParam and update computed value.
+    _trackTargetParam: function () {
+      if (this.computedValue !== this._targetAudioParam.value) {
+        this.set('computedValue', this._targetAudioParam.value);
+        this._updateView();
+      }
+
+      if (this.track)
+        setTimeout(this._trackTargetParam.bind(this), 250);
+    },
+
+    
+
+    // Update the value with the view change: view => model
+    _handleTrackByDelta: function (delta) {
+      this._normValue = Math.min(Math.max(this._normValue + delta, 0.0), 1.0);
+      this.value = this._normValue * (this.maxValue - this.minValue) + this.minValue;
+
+      if (this._targetAudioParam)
+        this._targetAudioParam.value = this.value;
+
+      // Notify the controller with the change.
+      this._notify('touched', { value: this.value });
+
+      this._updateView();
+    },
+
+    _updateView: function () {
+      var target = this._normValue * Math.PI * 1.5 ;
+      this._arcPath.x = this._arcCenter + this._arcRadius * Math.cos(this._offsetRadian + target);
+      this._arcPath.y = this._arcCenter + this._arcRadius * Math.sin(this._offsetRadian + target);
+      this._arcPath.largeArcFlag = (target < Math.PI) ? false : true;
+
+      this._valueString = this.value.toFixed(2);
+
+      // this._render();
+    },
+
+    // _render: function () {},
+
+
+    /** UI helpers */
+
+    _onTrack: function (event) {
+
+      var pos = event.detail;
+
+      // Pure x, y coordinates should be contained inside the target element
+      // without padding or margin.
+      pos.x = event.detail.sourceEvent.offsetX;
+      pos.y = event.detail.sourceEvent.offsetY;
+
+      switch(pos.state) {
+
+        case 'start':
+          document.body.style.cursor = 'move';
+          break;
+
+        case 'track':
+          var delta = (pos.ddx || -pos.ddy) * ((event.detail.sourceEvent.shiftKey) ? 0.001 : 0.01);
+          this._handleTrackByDelta(delta);
+          break;
+
+        case 'end':
+          document.body.style.cursor = 'default';
+          break;
+      }
+    },
+
+
+    /** communication */
+
+    _notify: function (eventType, data) {
+      if (this._controller)
+        this._controller.postMessage(this._componentId + '#' + this.label, eventType, data);
+    },
+
+
+    /** Polymer life cycle: created -> ready -> attached **/
+
+    created: function () {},
+
+    ready: function() {
+      this._initialize();
+    },
+
+    attached: function () {
+      this._updateView();
+    },
+
+
+    /**
+     * Sets the current value and update the view accordingly.
+     * @param {[type]} value [description]
+     */
+    setValue: function (value) {
+      if (value === this.value)
+        return;
+
+      this.value = Math.min(Math.max(this.minValue, value), this.maxValue);  
+      this._normValue = (this.value - this.minValue) / (this.maxValue - this.minValue);
+      
+      if (this._targetAudioParam)
+        this._targetAudioParam.value = this.value;
+
+      this._updateView();
+    },
+
+    /**
+     * Returns the current value.
+     * @return {Number} The current value.
+     */
+    getValue: function () {
+      return this.value;
+    },
+
+    /**
+     * Sets the controller object for reporting the local state change.
+     * @param {Object} controller A controller (message router).
+     */
+    setController: function (controller) {
+      this._controller = controller;
+    },
+
+    /**
+     * Binds to an AudioParam object.
+     * @param {Object} audioParam AudioParam object to bind.
+     */
+    bind: function (audioParam) {
+      if (!audioParam)
+        return;
+
+      this._targetAudioParam = audioParam;
+
+      // Forcibly update the audioParam value with the value.
+      this._targetAudioParam.value = this.value;
+
+      // Update the view to reflect the most recent change.
+      this._updateView();
+
+      if (this.track)
+        this._trackTargetParam();
+    }
+
+  });
+
+</script>

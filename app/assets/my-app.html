@@ -5,16 +5,29 @@
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/spiral-knob/spiral-knob.html">
+
+<script src="../bower_components/spiral/spiral.min.js"></script>
 
 <dom-module id="my-app">
 
   <style>
     /* your style here */
+    :host {
+      display: block;
+      margin: 1em;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      color: #263238;
+      -webkit-font-smoothing: antialiased;
+      -webkit-user-select: none;
+    }
   </style>
 
   <template>
     <!-- your DOM here -->
     <h1>My First Music App!</h1>
+    <spiral-knob id="knobAmp" label="Amp" value="0.25"></spiral-knob>
   </template>
 
   <script>
@@ -22,16 +35,38 @@
 
       is: "my-app",
 
+      /* user-defined properties */
       properties: {
-        /* user-defined properties */
+        
+        context: {
+          type: Object,
+          value: new AudioContext()
+        }
+        
       },
 
       /* user-defined methods */
+      _buildAudioGraph: function () {
+        this.context.createNodes(this, {
+          'osc': 'Oscillator',
+          'amp': 'Gain'
+        });
 
+        this.osc.to(this.amp).to(this.context.DAC);
+        this.amp.value = 0.25;
+        this.osc.frequency.value = 220;
+        this.osc.start();
+      },
+
+      _bindUI: function () {
+        this.$.knobAmp.bind(this.amp.gain);
+      },
 
       /* Polymer built-in event handlers */
       ready: function () {
         console.log('My app is ready!');
+        this._buildAudioGraph();
+        this._bindUI();
       },
 
       attached: function () {}
