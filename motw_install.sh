@@ -17,9 +17,11 @@ printf "${LGR}[MOTW-BP] ${WHT}Installing:\n"
 printf "  + installing Node modules...\n"
 npm install > motw_install.log
 printf "  + installing Bower components...\n"
-pushd src >> ../motw_install.log
+pushd tutorials >> ../motw_install.log
 bower install >> ../motw_install.log
 popd >> ../motw_install.log
+
+
 
 # Finish
 printf "${LGR}[MOTW-BP] ${WHT}Done!\n"
