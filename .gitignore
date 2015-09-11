@@ -1,6 +1,7 @@
-.DS_Store
 .publish/
 node_modules/
-tutorials_ans/
+app/bower_components/
+
+.DS_Store
 NOTES.md
 motw_install.log
