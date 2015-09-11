@@ -46,11 +46,6 @@
         "title": "MIDI Inspector",
         "url": "midi-inspector.html",
         "hash": "midi-inspector"
-      },
-      {
-        "title": "Drumpad",
-        "url": "midi-drumpad.html",
-        "hash": "midi-drumpad"
       }
     ]
   },

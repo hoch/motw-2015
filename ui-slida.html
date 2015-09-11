@@ -68,34 +68,42 @@
     is: 'motw-slida',
 
     properties: {
+
       label: {
         type: String,
         value: 'unlabeled'
       },
+
       precision: {
         type: Number,
         value: 2
       },
+
       value: {
         type: Number,
         value: 64
       },
+
       minValue: {
         type: Number,
         value: 0
       },
+
       maxValue: {
         type: Number,
         value: 127
       },
+
       _width: {
         type: Number,
         value: 128  
       },
+
       _valueString: {
         type: String,
         value: 64
       },
+
       _controller: {
         type: Object,
         value: null
@@ -122,7 +130,6 @@
     },
 
     _onTrack: function (event) {
-      // console.dir(event.detail.sourceEvent.target.nodeName)
       if (event.detail.sourceEvent.target.nodeName !== 'rect')
         return;
       
@@ -157,10 +164,12 @@
 
     created: function () {},
     
-    ready: function () {},
+    ready: function () {
+      this._updateView();
+    },
     
     attached: function () {
-      this._updateView();
+      
     }
 
   });
