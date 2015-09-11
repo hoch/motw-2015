@@ -8,8 +8,6 @@
 <head>
   <title>Tutorial: MIDI | MOTW 2015</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="assets/motw-doc-header.html">
   <style>
@@ -46,12 +44,7 @@
   <div class="info">
     <h1>MIDI</h1>
     <h2>MIDI Inspector</h2>
-    <p class="description">Description here.</p>
-    <ol>
-      <li>Item 1</li>
-      <li>Item 2</li>
-      <li>Item 3</li>
-    </ol>
+    <p class="description">Inspect incoming MIDI message.</p>
   </div>
 
   <div class="workspace">
@@ -75,8 +68,11 @@
   </div>
   
 <script id="tutorial-code">
-// Entry point.
-window.addEventListener('WebComponentsReady', function () {
+
+/**
+ * TASK 1: Implement initialize() method.
+ */
+function initialize() {
 
   var doms = {
     type: document.getElementById('event-type'),
@@ -85,7 +81,11 @@ window.addEventListener('WebComponentsReady', function () {
     log: document.getElementById('log')
   };
 
-  var dummyTarget = {
+  /**
+   * 1.1 Design |dummyMIDITarget| object and create |onmidimessage| handler
+   *   method to print out the incoming MIDI message into a DIV.
+   */
+  var dummyMIDITarget = {
     onmidimessage: function (message) {
       doms.type.textContent = message.type;
       doms.data1.textContent = message.data1;
@@ -100,14 +100,19 @@ window.addEventListener('WebComponentsReady', function () {
     }
   };
 
+  /**
+   * 1.2 Create Spiral MIDIManager and connect all MIDI sources to the dummy
+   *   MIDI target created above.
+   */
   Spiral.createMIDIManager().start().then(function (MIDI) {
-
-    MIDI.defineTarget('dummy', dummyTarget);
+    MIDI.defineTarget('dummy', dummyMIDITarget);
     MIDI.connectAll().to('dummy');
-
   });
 
-});
+}
+
+// Entry point.
+window.addEventListener('WebComponentsReady', initialize);
 </script>
 
 </body>
