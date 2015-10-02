@@ -10,11 +10,19 @@ var gulp        = require('gulp'),
 
 var deploy      = require('gulp-gh-pages');
 
+/**
+ * clean
+ * : Cleans the temporary directory for publishing.
+ */
 gulp.task('clean', del.bind(null, [
   '.publish'
 ]));
 
-gulp.task('tutorials', function () {
+/**
+ * tutorial
+ * : Starts the server out of the tutorial directory.
+ */
+gulp.task('tutorial', function () {
   browserSync.init({
     notify: false,
     server: {
@@ -29,6 +37,10 @@ gulp.task('tutorials', function () {
   ], browserSync.reload);
 });
 
+/**
+ * app
+ * : Starts the server out of the application directory.
+ */
 gulp.task('app', function () {
   browserSync.init({
     notify: false,
@@ -46,16 +58,28 @@ gulp.task('app', function () {
   ], browserSync.reload);
 });
 
-gulp.task('deploy-tutorials', function () {
+/**
+ * deploy-tutorial
+ * : Deploy the tutorial directory to the associated GitHub gh-pages branch.
+ */
+gulp.task('deploy-tutorial', function () {
   return gulp.src('tutorials/**/*')
     .pipe(deploy());
 });
 
+/**
+ * deploy-app
+ * : Deploy the application directory to the associated GitHub gh-pages branch.
+ */
 gulp.task('deploy-app', function () {
   return gulp.src('app/**/*')
     .pipe(deploy());
 });
 
+/**
+ * default
+ * : Launch the server with the application.
+ */
 gulp.task('default', function (cb) {
   runSequence('app', cb);
 });

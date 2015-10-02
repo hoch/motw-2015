@@ -1,16 +1,16 @@
 {
   "name": "motw-2015",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "The boilerplate project with code examples for MOTW 2015 workshop.",
   "author": "Hongchan Choi <hongchan.choi@gmail.com>",
   "devDependencies": {
-    "browser-sync": "^2.8.2",
-    "del": "^1.2.0",
+    "browser-sync": "^2.9.8",
+    "del": "^2.0.2",
     "gulp": "^3.9.0",
     "gulp-gh-pages": "^0.5.2",
     "gulp-load-plugins": "^0.10.0",
-    "gulp-uglify": "^1.2.0",
-    "run-sequence": "^1.1.2"
+    "gulp-uglify": "^1.4.1",
+    "run-sequence": "^1.1.4"
   },
   "repository": {
     "type": "git",
