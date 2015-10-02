@@ -8,30 +8,18 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../iron-icons/iron-icons.html">
-<link rel="import" href="../paper-tooltip.html">
-
-<dom-module id="test-button">
+<dom-module id="paper-item-shared-styles">
   <template>
     <style>
       :host {
-        display: inline-block;
+        display: block;
+        min-height: var(--paper-item-min-height, 48px);
+        padding: 0px 16px;
       }
 
-      paper-icon-button {
-        padding: 0;
+      :host > ::content > *:not(:first-child):not(:last-child) {
+        margin-right: 16px;
       }
     </style>
-
-    <paper-icon-button id="m" icon="menu" alt="menu"></paper-icon-button>
-    <paper-tooltip for="m" offset="8">hot dogs</paper-tooltip>
   </template>
-
-  <script>
-    Polymer({
-      is: 'test-button'
-    });
-  </script>
 </dom-module>
