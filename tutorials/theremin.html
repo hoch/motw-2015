@@ -16,19 +16,22 @@
 
   <div class="info">
     <h1>Subtractive Synth</h1>
-    <h2>Monophony</h2>
+    <h2>Theremin</h2>
     <p class="description">A simple subtractive monophonic synth with the filter control.</p>
     <ul>
-      <li>Change <strong>Amp</strong> knob to hear something.</li>
       <li>Press keys to change the pitch: <code>[ a, w, s, e, d, f, t, g, y, h, j, k ]</code></li>
-      <li>Change <strong>Cutoff</strong> and <strong>Reso</strong> knobs to change the tone.</li>
+      <li>For example: play <code>k j d h g a s d f</code></li>
     </ul>
   </div>
 
   <div class="workspace">
-    <spiral-knob id="k-cutoff" label="Cutoff" value="250" min-value="60" max-value="1000"></spiral-knob>
-    <spiral-knob id="k-reso" label="Reso" value="1.0" min-value="0.1" max-value="20"></spiral-knob>
-    <spiral-knob id="k-amp" label="Amp" value="0.0" min-value="0.0" max-value="1.0"></spiral-knob>
+    <spiral-knob id="k-vib-rate" label="Vib Rate" value="7.5" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-vib-amt" label="Vib Amt" value="25" min-value="5" max-value="30"></spiral-knob>
+    <spiral-knob id="k-freq-bpf" label="Passband" value="1532" min-value="60" max-value="5000"></spiral-knob>
+    <spiral-knob id="k-width-bpf" label="Width" value="1.37" min-value="0.1" max-value="2"></spiral-knob>
+    <spiral-knob id="k-freq-lpf" label="Cutoff" value="587" min-value="60" max-value="1000"></spiral-knob>
+    <spiral-knob id="k-reso-lpf" label="Reso" value="9.8" min-value="0.1" max-value="20"></spiral-knob>
+    <spiral-knob id="k-amp" label="Amp" value="0.8" min-value="0.0" max-value="1.0"></spiral-knob>
   </div>
 
   <div id="code-viewer">
@@ -43,15 +46,26 @@ window.addEventListener('WebComponentsReady', function () {
    */
 
   var context = new AudioContext();
+
+  var lfo = context.createOscillator();
+  var lfoGain = context.createGain();
   var sawosc = context.createOscillator();
+  var bandpass = context.createBiquadFilter();
   var lowpass = context.createBiquadFilter();
   var amp = context.createGain();
 
   sawosc.type = 'sawtooth';
+  bandpass.type = 'bandpass';
+
+  sawosc.frequency.setValueAtTime(Spiral.mtof(60 + 12), context.currentTime);
   lowpass.frequency.value = 1000;
   amp.gain.value = 0.0;
-  
-  sawosc.to(lowpass).to(amp).to(context.DAC);
+
+  lfoGain.gain.value = 10.0;
+  lfo.to(lfoGain).to(sawosc.detune);
+  lfo.start();
+
+  sawosc.to(bandpass).to(lowpass).to(amp).to(context.DAC);
   sawosc.start();
 
 
@@ -86,7 +100,8 @@ window.addEventListener('WebComponentsReady', function () {
     if (!keymap.hasOwnProperty(event.keyCode))
       return;
 
-    sawosc.frequency.value = Spiral.mtof(keymap[event.keyCode]);
+    var freq = Spiral.mtof(keymap[event.keyCode] + 12);
+    sawosc.frequency.setTargetAtTime(freq, context.currentTime, 0.135);
   }
 
   window.addEventListener('keydown', handleKeyEvent);
@@ -99,14 +114,24 @@ window.addEventListener('WebComponentsReady', function () {
    */
 
   var knobs = {
-    cutoff: document.getElementById('k-cutoff'),
-    reso: document.getElementById('k-reso'),
+    vibrate: document.getElementById('k-vib-rate'),
+    vibamt: document.getElementById('k-vib-amt'),
+    passband: document.getElementById('k-freq-bpf'),
+    width: document.getElementById('k-width-bpf'),
+    cutoff: document.getElementById('k-freq-lpf'),
+    reso: document.getElementById('k-reso-lpf'),
     amp: document.getElementById('k-amp')
   };
   
+  knobs.vibrate.bind(lfo.frequency);
+  knobs.vibamt.bind(lfoGain.gain);
+  knobs.passband.bind(bandpass.frequency);
+  knobs.width.bind(bandpass.Q);
   knobs.cutoff.bind(lowpass.frequency);
   knobs.reso.bind(lowpass.Q);
   knobs.amp.bind(amp.gain);
+
+  // Play sequence:
 });
 </script>
 
