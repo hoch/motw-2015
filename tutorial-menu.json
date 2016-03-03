@@ -8,6 +8,11 @@
         "hash": "tutorial-monophony"
       },
       {
+        "title": "Theremin",
+        "url": "theremin.html",
+        "hash": "tutorial-theremin"
+      },
+      {
         "title": "Modulation",
         "url": "modulation.html",
         "hash": "tutorial-modulation"

@@ -212,17 +212,9 @@ Example:
       // The norm value needs to be updated for the first time.
       this._normValue = (this.value - this.minValue) / (this.maxValue - this.minValue);
       var target = this._normValue * Math.PI * 1.5;
-      var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offsetRadian);
-      var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offsetRadian);
-      var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offsetRadian);
-      var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offsetRadian);
-      var flag = (target < Math.PI) ? 0 : 1;
-      var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
-      d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
+      this._updateArc(target);
 
-      this.$.knob.setAttribute('d', d);
-      this.$.knob.setAttribute('stroke-width', baseSize * 0.12);
-      this._arcPath = this.$.knob.pathSegList.getItem(1);
+      this.$.knob.setAttribute('stroke-width', baseSize * 0.12);      
     },
 
     // Track the current target audioParam and update computed value.
@@ -252,18 +244,23 @@ Example:
       this._updateView();
     },
 
-    _updateView: function () {
-      var target = this._normValue * Math.PI * 1.5 ;
-      this._arcPath.x = this._arcCenter + this._arcRadius * Math.cos(this._offsetRadian + target);
-      this._arcPath.y = this._arcCenter + this._arcRadius * Math.sin(this._offsetRadian + target);
-      this._arcPath.largeArcFlag = (target < Math.PI) ? false : true;
-
-      this._valueString = this.value.toFixed(2);
-
-      // this._render();
+    // helper method for svg update
+    _updateArc: function (target) {
+      var x1 = this._arcCenter + this._arcRadius * Math.cos(this._offsetRadian);
+      var y1 = this._arcCenter + this._arcRadius * Math.sin(this._offsetRadian);
+      var x2 = this._arcCenter + this._arcRadius * Math.cos(target + this._offsetRadian);
+      var y2 = this._arcCenter + this._arcRadius * Math.sin(target + this._offsetRadian);
+      var flag = (target < Math.PI) ? 0 : 1;
+      var d = 'M ' + x1 + ' ' + y1 + ' A ' + this._arcRadius + ' ' + this._arcRadius;
+      d += ' 0 ' + flag + ' 1 ' + x2 + ' ' + y2 + ' ';
+      this.$.knob.setAttribute('d', d);
     },
 
-    // _render: function () {},
+    _updateView: function () {
+      var target = this._normValue * Math.PI * 1.5 ;
+      this._updateArc(target);
+      this._valueString = this.value.toFixed(2);
+    },
 
 
     /** UI helpers */
